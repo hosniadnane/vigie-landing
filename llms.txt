@@ -1,0 +1,23 @@
+# Tocsio
+
+> Tocsio aide les petits éditeurs de logiciels français et européens à respecter le Cyber Resilience Act (règlement (UE) 2024/2847) : nomenclature logicielle (SBOM), veille des vulnérabilités activement exploitées, compte à rebours de déclaration à l'ENISA (24 heures, 72 heures, rapport final) et documents de conformité. Pour les éditeurs SaaS, Tocsio prépare le dossier fournisseur demandé par les clients soumis à DORA et NIS2. Projet en préparation, hébergé en France.
+
+Faits clés sur le Cyber Resilience Act, tels que présentés sur ce site :
+
+- Depuis le 11 septembre 2026, les fabricants de produits comportant des éléments numériques doivent signaler les vulnérabilités activement exploitées et les incidents graves via la plateforme unique de signalement de l'ENISA : alerte précoce sous 24 heures, notification sous 72 heures, rapport final 14 jours après la mise à disposition d'un correctif (un mois après la notification pour un incident grave). Article 14.
+- Le règlement ne prévoit pas de seuil de taille. Les microentreprises et petites entreprises ne peuvent toutefois pas recevoir d'amende pour avoir manqué le délai de 24 heures de l'alerte précoce. Article 64, paragraphe 10.
+- Toutes les autres obligations s'appliquent à partir du 11 décembre 2027 : exigences essentielles de l'annexe I, gestion des vulnérabilités avec SBOM, politique de divulgation coordonnée, mises à jour de sécurité gratuites pendant au moins cinq ans, documentation technique de l'annexe VII, déclaration UE de conformité et marquage CE.
+- Les services purement SaaS et l'open source non commercial sortent en général du champ du règlement.
+
+## Outils gratuits
+
+- [Scanner de dépendances](https://hosniadnane.github.io/vigie-landing/scanner/) : analyse un dépôt GitHub public ou des fichiers de dépendances dans le navigateur, liste les vulnérabilités connues (OSV.dev), signale celles du catalogue KEV de la CISA et exporte un SBOM CycloneDX.
+- [Test : votre logiciel est-il concerné par le CRA ?](https://hosniadnane.github.io/vigie-landing/test-cra/) : six questions, résultat immédiat avec les obligations applicables.
+
+## Guides
+
+- [Cyber Resilience Act : ce que doivent faire les éditeurs de logiciels, et quand](https://hosniadnane.github.io/vigie-landing/cyber-resilience-act-editeurs/) : champ d'application, délais de déclaration, cas des TPE, obligations de 2027, sanctions, premières étapes.
+
+## Produit
+
+- [Accueil, offres et tarifs](https://hosniadnane.github.io/vigie-landing/) : Découverte 0 €, Fournisseur 39 € HT par mois, Essentiel 49 € HT par mois, Équipe 99 € HT par mois.
