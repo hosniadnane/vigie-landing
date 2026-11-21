@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Test gratuit : votre logiciel est-il concerné par le Cyber Resilience Act ?</title>
+<meta name="description" content="Six questions pour savoir si votre logiciel entre dans le champ du Cyber Resilience Act, quelles obligations s'appliquent déjà et ce qu'il vous reste à mettre en place avant décembre 2027.">
+<link rel="canonical" href="https://hosniadnane.github.io/vigie-landing/test-cra/">
+<style>
+  :root {
+    --paper: #FBFBFD;
+    --surface: #FFFFFF;
+    --ink: #1D1D1F;
+    --mute: #6E6E73;
+    --line: #E3E3E8;
+    --blue: #0B3B8C;
+    --blue-soft: #EEF2FA;
+    --signal: #C8322B;
+    --ok: #1F7A4D;
+    --nav: rgba(251, 251, 253, 0.72);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #0F1012;
+      --surface: #17181B;
+      --ink: #F5F5F7;
+      --mute: #A1A1A6;
+      --line: #2C2D31;
+      --blue: #7FA6F0;
+      --blue-soft: #18213A;
+      --signal: #FF6B5E;
+      --ok: #5BC98F;
+      --nav: rgba(15, 16, 18, 0.72);
+      color-scheme: dark;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font: 100%/1.6 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-optical-sizing: auto;
+  }
+  a { color: var(--blue); }
+  :focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; border-radius: 6px; }
+  .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  .nav {
+    position: sticky; top: 0; z-index: 10;
+    padding-top: env(safe-area-inset-top, 0px);
+    background: var(--nav);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+  }
+  .nav-inner { max-width: 1040px; margin: 0 auto; padding-inline: 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; height: 56px; }
+  .brand { font-weight: 650; font-size: 1.125rem; letter-spacing: -0.01em; color: var(--ink); text-decoration: none; }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-height: 44px; padding: 0 22px; border: 0; border-radius: 999px;
+    background: var(--blue); color: #fff; font: inherit; font-weight: 600; text-decoration: none; cursor: pointer;
+    transition: transform 100ms ease-out, opacity 150ms ease;
+  }
+  .btn:hover { opacity: 0.92; }
+  .btn:active { transform: scale(0.97); }
+  .btn-small { min-height: 34px; padding: 0 14px; font-size: 0.875rem; }
+  @media (prefers-color-scheme: dark) { .btn { color: #0F1012; } }
+
+  main { max-width: 720px; margin: 0 auto; padding: clamp(48px, 8vw, 88px) 20px clamp(56px, 8vw, 96px); }
+  h1 { margin: 0; font-size: clamp(2rem, 5vw, 3rem); line-height: 1.08; letter-spacing: -0.032em; }
+  .lede { margin: 20px 0 0; font-size: 1.125rem; color: var(--mute); max-width: 60ch; }
+
+  form.quiz { margin-top: 40px; }
+  fieldset { margin: 0; padding: 28px 0; border: 0; border-top: 1px solid var(--line); }
+  legend { float: left; width: 100%; padding: 0; font-weight: 650; font-size: 1.0625rem; letter-spacing: -0.01em; }
+  .hint { clear: both; margin: 0; padding-top: 6px; color: var(--mute); font-size: 0.9375rem; max-width: 62ch; }
+  .options { clear: both; display: grid; gap: 10px; padding-top: 16px; }
+  .opt {
+    display: flex; gap: 12px; align-items: flex-start;
+    padding: 14px 16px; border-radius: 14px;
+    background: var(--surface); border: 1px solid var(--line);
+    cursor: pointer;
+  }
+  .opt:has(input:checked) { border-color: var(--blue); background: var(--blue-soft); }
+  .opt input { margin: 3px 0 0; accent-color: var(--blue); width: 18px; height: 18px; flex: none; }
+  .opt span { line-height: 1.45; }
+  .submit-row { padding-top: 28px; border-top: 1px solid var(--line); }
+  .form-error { margin: 12px 0 0; color: var(--signal); min-height: 1.5em; }
+
+  .result { margin-top: 48px; padding: clamp(24px, 4vw, 36px); border-radius: 22px; background: var(--surface); border: 1px solid var(--line); }
+  .verdict { margin: 0; font-size: clamp(1.5rem, 3.4vw, 2rem); line-height: 1.15; letter-spacing: -0.026em; }
+  .verdict.in { color: var(--signal); }
+  .verdict.out { color: var(--ok); }
+  .result h3 { margin: 28px 0 0; font-size: 1.0625rem; }
+  .result p, .result li { max-width: 62ch; }
+  .result ul { margin: 12px 0 0; padding-left: 1.2em; }
+  .result li + li { margin-top: 6px; }
+  .score { margin: 8px 0 0; color: var(--mute); }
+  .note { margin-top: 20px; padding: 16px 18px; border-radius: 14px; background: var(--blue-soft); }
+  .note p { margin: 0; }
+
+  .signup { margin-top: 32px; padding-top: 28px; border-top: 1px solid var(--line); }
+  .signup h3 { margin: 0; }
+  .signup-row { display: flex; gap: 10px; margin-top: 16px; }
+  .signup input[type=email] {
+    flex: 1; min-width: 0; min-height: 44px; padding: 0 16px;
+    border: 1px solid var(--line); border-radius: 999px; background: var(--paper); color: var(--ink); font: inherit;
+  }
+  .status { margin: 12px 0 0; min-height: 1.5em; font-size: 0.9375rem; }
+  .status.ok { color: var(--blue); }
+  .status.err { color: var(--signal); }
+  @media (max-width: 480px) { .signup-row { flex-direction: column; } }
+
+  .disclaimer { margin-top: 40px; color: var(--mute); font-size: 0.875rem; }
+  footer { padding-block: 32px calc(32px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--line); color: var(--mute); font-size: 0.875rem; }
+  footer p { max-width: 1000px; margin: 0 auto; padding-inline: 20px; }
+
+  @media (prefers-reduced-motion: reduce) { .btn { transition: none; } }
+  @media (prefers-reduced-transparency: reduce) {
+    .nav { background: var(--paper); backdrop-filter: none; -webkit-backdrop-filter: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="../">Vigie</a>
+    <a class="btn btn-small" href="../#inscription">Réserver mon accès</a>
+  </div>
+</header>
+
+<main>
+  <h1>Votre logiciel est-il concerné par le Cyber Resilience Act ?</h1>
+  <p class="lede">Six questions, deux minutes. Vous saurez si votre produit entre probablement dans le champ du règlement, ce qui s'applique déjà et ce qu'il vous reste à préparer avant décembre 2027.</p>
+
+  <form class="quiz" id="quiz" novalidate>
+    <fieldset>
+      <legend>1. Vendez-vous ou distribuez-vous ce produit dans l'Union européenne, dans le cadre d'une activité commerciale ?</legend>
+      <p class="hint">Une version gratuite compte aussi comme activité commerciale si elle est monétisée, par exemple par un abonnement, du support payant ou des données.</p>
+      <div class="options">
+        <label class="opt"><input type="radio" name="commercial" value="yes"><span>Oui</span></label>
+        <label class="opt"><input type="radio" name="commercial" value="no"><span>Non, c'est un projet open source sans activité commerciale</span></label>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>2. Comment vos clients utilisent-ils votre produit ?</legend>
+      <div class="options">
+        <label class="opt"><input type="radio" name="delivery" value="installed"><span>Ils l'installent : logiciel, application mobile, plugin, extension ou bibliothèque</span></label>
+        <label class="opt"><input type="radio" name="delivery" value="device"><span>Il est embarqué dans un appareil : firmware, objet connecté</span></label>
+        <label class="opt"><input type="radio" name="delivery" value="hybrid"><span>En ligne, avec une application ou un agent installé chez le client</span></label>
+        <label class="opt"><input type="radio" name="delivery" value="saas"><span>Uniquement en ligne, dans un navigateur (SaaS)</span></label>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>3. Votre produit relève-t-il déjà d'une réglementation sectorielle ?</legend>
+      <p class="hint">Par exemple : dispositifs médicaux, véhicules, aviation civile, équipements marins.</p>
+      <div class="options">
+        <label class="opt"><input type="radio" name="sector" value="no"><span>Non</span></label>
+        <label class="opt"><input type="radio" name="sector" value="yes"><span>Oui</span></label>
+        <label class="opt"><input type="radio" name="sector" value="unsure"><span>Je ne sais pas</span></label>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>4. Votre produit appartient-il à l'une de ces catégories ?</legend>
+      <p class="hint">Navigateur, gestionnaire de mots de passe, VPN, antivirus, système d'exploitation, gestion des identités, pare-feu ou détection d'intrusion, hyperviseur.</p>
+      <div class="options">
+        <label class="opt"><input type="radio" name="sensitive" value="no"><span>Non</span></label>
+        <label class="opt"><input type="radio" name="sensitive" value="yes"><span>Oui</span></label>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>5. Votre entreprise compte-t-elle moins de 50 salariés et au plus 10 millions d'euros de chiffre d'affaires ou de bilan ?</legend>
+      <div class="options">
+        <label class="opt"><input type="radio" name="small" value="yes"><span>Oui</span></label>
+        <label class="opt"><input type="radio" name="small" value="no"><span>Non</span></label>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>6. Qu'avez-vous déjà mis en place ?</legend>
+      <p class="hint">Cochez tout ce qui existe aujourd'hui.</p>
+      <div class="options">
+        <label class="opt"><input type="checkbox" name="ready" value="versions"><span>La liste des versions de vos produits encore utilisées par des clients</span></label>
+        <label class="opt"><input type="checkbox" name="ready" value="sbom"><span>Une nomenclature logicielle (SBOM) pour chaque version</span></label>
+        <label class="opt"><input type="checkbox" name="ready" value="watch"><span>Une veille sur les vulnérabilités activement exploitées dans vos composants</span></label>
+        <label class="opt"><input type="checkbox" name="ready" value="report"><span>Une procédure pour déclarer une faille à l'ENISA en 24 heures</span></label>
+        <label class="opt"><input type="checkbox" name="ready" value="cvd"><span>Une politique de divulgation coordonnée et un fichier security.txt</span></label>
+        <label class="opt"><input type="checkbox" name="ready" value="docs"><span>Une documentation technique de cybersécurité, avec analyse des risques</span></label>
+      </div>
+    </fieldset>
+
+    <div class="submit-row">
+      <button class="btn" type="submit">Voir mon résultat</button>
+      <p class="form-error" role="alert"></p>
+    </div>
+  </form>
+
+  <section class="result" id="result" hidden aria-live="polite" tabindex="-1">
+    <h2 class="verdict" id="verdict"></h2>
+    <div id="detail"></div>
+
+    <form class="signup" id="signup" novalidate>
+      <h3>Suivez votre mise en conformité avec Vigie</h3>
+      <p class="hint">Vigie surveille vos composants, lance le compte à rebours de 24 heures et prépare vos documents. Inscrivez-vous pour l'accès anticipé, gratuit jusqu'au lancement.</p>
+      <div class="signup-row">
+        <label for="email" class="visually-hidden">Adresse e-mail professionnelle</label>
+        <input id="email" name="email" type="email" autocomplete="email" placeholder="vous@editeur.fr" required>
+        <button class="btn" type="submit">Réserver mon accès anticipé</button>
+      </div>
+      <p class="status" role="status" aria-live="polite"></p>
+    </form>
+  </section>
+
+  <p class="disclaimer">Ce test donne une indication et ne constitue pas un conseil juridique. Pour une décision engageante, référez-vous au <a href="https://eur-lex.europa.eu/eli/reg/2024/2847/oj">règlement (UE) 2024/2847</a> ou à votre conseil. Pour le détail des obligations, lisez notre <a href="../cyber-resilience-act-editeurs/">guide du Cyber Resilience Act pour les éditeurs</a>.</p>
+</main>
+
+<footer>
+  <p>Vigie est un projet en préparation. <a href="../">Retour à l'accueil</a></p>
+</footer>
+
+<script>
+  const FORM_ENDPOINT = "https://formspree.io/f/xvkaworv";
+
+  const READY_ITEMS = {
+    versions: "Listez les versions de vos produits encore utilisées : l'obligation de déclaration couvre aussi celles installées avant septembre 2026.",
+    sbom: "Générez une nomenclature logicielle (SBOM) pour chaque version, par exemple avec Syft ou les outils CycloneDX.",
+    watch: "Mettez en place une veille quotidienne de vos composants face aux vulnérabilités activement exploitées (catalogue KEV de la CISA, base OSV).",
+    report: "Préparez la procédure des 24 heures : qui déclare, avec quel accès à la plateforme de l'ENISA, et quel modèle d'alerte.",
+    cvd: "Publiez une politique de divulgation coordonnée et un fichier security.txt.",
+    docs: "Commencez la documentation technique de l'annexe VII, dont l'analyse des risques de cybersécurité."
+  };
+
+  const quiz = document.getElementById("quiz");
+  const formError = quiz.querySelector(".form-error");
+  const result = document.getElementById("result");
+  const verdictEl = document.getElementById("verdict");
+  const detailEl = document.getElementById("detail");
+  let summary = "";
+
+  function value(name) {
+    const el = quiz.querySelector(`input[name="${name}"]:checked`);
+    return el ? el.value : null;
+  }
+
+  function list(items) {
+    return "<ul>" + items.map((t) => `<li>${t}</li>`).join("") + "</ul>";
+  }
+
+  function render(verdict, tone, html) {
+    verdictEl.textContent = verdict;
+    verdictEl.className = "verdict " + tone;
+    detailEl.innerHTML = html;
+    result.hidden = false;
+    result.focus({ preventScroll: true });
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    result.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+  }
+
+  quiz.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const answers = {
+      commercial: value("commercial"),
+      delivery: value("delivery"),
+      sector: value("sector"),
+      sensitive: value("sensitive"),
+      small: value("small")
+    };
+    const missing = Object.entries(answers).filter(([, v]) => !v).length;
+    if (missing) {
+      formError.textContent = missing === 1 ? "Il reste une question sans réponse." : `Il reste ${missing} questions sans réponse.`;
+      return;
+    }
+    formError.textContent = "";
+
+    const ready = [...quiz.querySelectorAll('input[name="ready"]:checked')].map((el) => el.value);
+    const gaps = Object.keys(READY_ITEMS).filter((k) => !ready.includes(k));
+
+    if (answers.commercial === "no") {
+      summary = "hors-champ-non-commercial";
+      render("Probablement hors du champ du CRA", "out",
+        "<p>Le règlement ne vise pas les logiciels libres publiés sans activité commerciale. Si vous êtes une fondation qui soutient durablement des projets libres, un régime allégé dit « steward » peut s'appliquer.</p>" +
+        "<p>Attention : dès qu'une version est monétisée (abonnement, support payant, données), elle redevient une activité commerciale.</p>");
+      return;
+    }
+
+    if (answers.sector === "yes") {
+      summary = "regime-sectoriel";
+      render("Probablement couvert par votre réglementation sectorielle", "out",
+        "<p>Les produits déjà régis par certains textes sectoriels, comme les dispositifs médicaux, les véhicules ou l'aviation civile, sont exclus du CRA. Leur cybersécurité relève de ces textes.</p>" +
+        "<p>Vérifiez que votre produit est entièrement couvert par cette réglementation : un logiciel vendu séparément peut, lui, entrer dans le champ du CRA.</p>");
+      return;
+    }
+
+    if (answers.delivery === "saas") {
+      summary = "saas-dora-nis2";
+      render("Le CRA vous concerne peu, mais vos clients peuvent avoir des exigences", "out",
+        "<p>Un service accessible uniquement en ligne sort en général du champ du CRA. Le traitement de données à distance n'est couvert que s'il fait partie d'un produit installé.</p>" +
+        "<h3>Ce qui peut vous concerner à la place</h3>" +
+        list([
+          "<strong>DORA</strong> : si vos clients sont des banques ou des assureurs, ils doivent tenir un registre de leurs prestataires informatiques et exiger des clauses précises dans vos contrats.",
+          "<strong>NIS2</strong> : vos clients soumis à NIS2 doivent sécuriser leur chaîne d'approvisionnement et vous enverront des questionnaires de sécurité."
+        ]) +
+        "<p>Vigie prépare votre dossier fournisseur : identifiant LEI ou EUID, sous-traitants, audits, plan de réversibilité.</p>");
+      return;
+    }
+
+    summary = "concerne" + (answers.sensitive === "yes" ? "-important" : "") + (answers.small === "yes" ? "-petite" : "") + `-${ready.length}sur6`;
+
+    let html = "";
+    if (answers.delivery === "hybrid") {
+      html += "<p>Votre application installée est un produit au sens du règlement, et le traitement de données à distance qui la fait fonctionner fait partie du produit.</p>";
+    }
+    if (answers.sector === "unsure") {
+      html += "<p>Vous ne savez pas si une réglementation sectorielle s'applique : vérifiez-le, car elle pourrait vous exclure du CRA. Le résultat ci-dessous suppose que ce n'est pas le cas.</p>";
+    }
+
+    html += "<h3>Déjà en vigueur depuis le 11 septembre 2026</h3>" +
+      list([
+        "Déclarer toute vulnérabilité activement exploitée : alerte précoce en 24 heures, notification en 72 heures, rapport final 14 jours après le correctif.",
+        "Déclarer tout incident grave selon les mêmes délais, avec un rapport final sous un mois.",
+        "Ces obligations couvrent aussi les versions déjà installées chez vos clients."
+      ]);
+
+    html += "<h3>Obligatoire au 11 décembre 2027</h3>" +
+      list([
+        "Respecter les exigences essentielles de l'annexe I.",
+        "Gérer les vulnérabilités, avec une nomenclature logicielle (SBOM) et une politique de divulgation coordonnée.",
+        "Fournir des mises à jour de sécurité gratuites pendant au moins cinq ans, sauf durée d'utilisation prévue plus courte.",
+        "Rédiger la documentation technique, signer la déclaration UE de conformité et apposer le marquage CE."
+      ]);
+
+    if (answers.sensitive === "yes") {
+      html += "<div class=\"note\"><p>Votre produit semble faire partie des produits « importants » listés à l'annexe III. Son évaluation de conformité peut exiger l'application de normes harmonisées ou l'intervention d'un organisme tiers, au lieu d'une simple auto-évaluation.</p></div>";
+    }
+    if (answers.small === "yes") {
+      html += "<div class=\"note\"><p>En tant que micro ou petite entreprise, vous ne pouvez pas recevoir d'amende pour avoir manqué le délai de 24 heures de l'alerte précoce (article 64, paragraphe 10). La déclaration, la notification à 72 heures et le rapport final restent obligatoires.</p></div>";
+    }
+
+    html += `<h3>Votre préparation</h3><p class="score">${ready.length} élément${ready.length > 1 ? "s" : ""} sur 6 en place.</p>`;
+    if (gaps.length) {
+      html += "<p>Ce qu'il vous reste à faire :</p>" + list(gaps.map((g) => READY_ITEMS[g]));
+    } else {
+      html += "<p>Vous avez les bases en place. L'enjeu est maintenant de les tenir à jour à chaque nouvelle version.</p>";
+    }
+
+    render("Votre produit est probablement concerné", "in", html);
+  });
+
+  const signup = document.getElementById("signup");
+  const input = document.getElementById("email");
+  const status = signup.querySelector(".status");
+
+  signup.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    status.className = "status";
+    if (!input.checkValidity()) {
+      status.textContent = "Saisissez une adresse e-mail valide.";
+      status.classList.add("err");
+      input.focus();
+      return;
+    }
+    const button = signup.querySelector("button");
+    button.disabled = true;
+    try {
+      const response = await fetch(FORM_ENDPOINT, {
+        method: "POST",
+        headers: { "Accept": "application/json", "Content-Type": "application/json" },
+        body: JSON.stringify({ email: input.value, source: "test-cra", resultat: summary })
+      });
+      if (!response.ok) throw new Error(String(response.status));
+      status.textContent = "C'est noté. Vous serez prévenu avant l'ouverture.";
+      status.classList.add("ok");
+      signup.reset();
+    } catch {
+      status.textContent = "L'inscription n'a pas abouti. Réessayez dans un instant.";
+      status.classList.add("err");
+    } finally {
+      button.disabled = false;
+    }
+  });
+</script>
+</body>
+</html>
