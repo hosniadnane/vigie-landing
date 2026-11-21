@@ -1,0 +1,683 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Scanner gratuit : SBOM et failles activement exploitées dans vos dépendances</title>
+<meta name="description" content="Analysez gratuitement un dépôt GitHub public ou un fichier de dépendances : nomenclature logicielle (SBOM CycloneDX), vulnérabilités connues et failles activement exploitées selon le catalogue KEV de la CISA. Analyse dans votre navigateur.">
+<link rel="canonical" href="https://hosniadnane.github.io/vigie-landing/scanner/">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Scanner Tocsio",
+  "applicationCategory": "SecurityApplication",
+  "operatingSystem": "Web",
+  "inLanguage": "fr",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+  "description": "Génère la nomenclature logicielle (SBOM CycloneDX) d'un projet et signale les vulnérabilités connues et activement exploitées de ses dépendances.",
+  "url": "https://hosniadnane.github.io/vigie-landing/scanner/"
+}
+</script>
+<style>
+  :root {
+    --paper: #FBFBFD;
+    --surface: #FFFFFF;
+    --ink: #1D1D1F;
+    --mute: #6E6E73;
+    --line: #E3E3E8;
+    --blue: #0B3B8C;
+    --blue-soft: #EEF2FA;
+    --signal: #C8322B;
+    --signal-soft: #FBEDEC;
+    --ok: #1F7A4D;
+    --nav: rgba(251, 251, 253, 0.72);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #0F1012;
+      --surface: #17181B;
+      --ink: #F5F5F7;
+      --mute: #A1A1A6;
+      --line: #2C2D31;
+      --blue: #7FA6F0;
+      --blue-soft: #18213A;
+      --signal: #FF6B5E;
+      --signal-soft: #3A1B19;
+      --ok: #5BC98F;
+      --nav: rgba(15, 16, 18, 0.72);
+      color-scheme: dark;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font: 100%/1.6 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-optical-sizing: auto;
+  }
+  a { color: var(--blue); }
+  :focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; border-radius: 6px; }
+  .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  .nav {
+    position: sticky; top: 0; z-index: 10;
+    padding-top: env(safe-area-inset-top, 0px);
+    background: var(--nav);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+  }
+  .nav-inner { max-width: 1040px; margin: 0 auto; padding-inline: 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; height: 56px; }
+  .brand { font-weight: 650; font-size: 1.125rem; letter-spacing: -0.01em; color: var(--ink); text-decoration: none; }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-height: 44px; padding: 0 22px; border: 0; border-radius: 999px;
+    background: var(--blue); color: #fff; font: inherit; font-weight: 600; text-decoration: none; cursor: pointer;
+    transition: transform 100ms ease-out, opacity 150ms ease;
+  }
+  .btn:hover { opacity: 0.92; }
+  .btn:active { transform: scale(0.97); }
+  .btn:disabled { opacity: 0.5; cursor: progress; }
+  .btn-small { min-height: 34px; padding: 0 14px; font-size: 0.875rem; }
+  .btn-ghost { background: transparent; color: var(--blue); border: 1px solid var(--line); }
+  @media (prefers-color-scheme: dark) { .btn { color: #0F1012; } .btn-ghost { color: var(--blue); } }
+
+  main { max-width: 880px; margin: 0 auto; padding: clamp(48px, 8vw, 88px) 20px clamp(56px, 8vw, 96px); }
+  h1 { margin: 0; max-width: 20ch; font-size: clamp(2rem, 5vw, 3rem); line-height: 1.08; letter-spacing: -0.032em; }
+  .lede { margin: 20px 0 0; font-size: 1.125rem; color: var(--mute); max-width: 62ch; }
+
+  .input-card { margin-top: 36px; padding: clamp(20px, 4vw, 32px); border-radius: 22px; background: var(--surface); border: 1px solid var(--line); }
+  .input-card h2 { margin: 0; font-size: 1.0625rem; letter-spacing: -0.01em; }
+  .row { display: flex; gap: 10px; margin-top: 14px; }
+  .row input[type=url] {
+    flex: 1; min-width: 0; min-height: 44px; padding: 0 16px;
+    border: 1px solid var(--line); border-radius: 999px; background: var(--paper); color: var(--ink); font: inherit;
+  }
+  @media (max-width: 560px) { .row { flex-direction: column; } }
+  .or { margin: 24px 0 0; padding-top: 24px; border-top: 1px solid var(--line); }
+  .drop {
+    display: block; margin-top: 14px; padding: 22px; border: 1.5px dashed var(--line); border-radius: 16px;
+    text-align: center; color: var(--mute); cursor: pointer;
+  }
+  .drop.over { border-color: var(--blue); background: var(--blue-soft); color: var(--ink); }
+  .drop input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+  .formats { margin: 12px 0 0; font-size: 0.875rem; color: var(--mute); }
+  .privacy { margin: 16px 0 0; font-size: 0.875rem; color: var(--mute); }
+
+  .status { margin: 20px 0 0; min-height: 1.6em; color: var(--mute); }
+  .status.err { color: var(--signal); }
+
+  .results { margin-top: 40px; }
+  .results h2 { margin: 0; font-size: clamp(1.5rem, 3.2vw, 2rem); letter-spacing: -0.026em; line-height: 1.15; }
+  .meta { margin: 8px 0 0; color: var(--mute); font-size: 0.9375rem; }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 24px; }
+  .stat { padding: 18px 20px; border-radius: 16px; background: var(--surface); border: 1px solid var(--line); }
+  .stat b { display: block; font-size: 2rem; line-height: 1.1; letter-spacing: -0.03em; }
+  .stat span { color: var(--mute); font-size: 0.9375rem; }
+  .stat.hot { background: var(--signal-soft); border-color: transparent; }
+  .stat.hot b { color: var(--signal); }
+  @media (max-width: 560px) { .stats { grid-template-columns: 1fr; } }
+
+  .callout { margin-top: 20px; padding: 18px 20px; border-radius: 16px; background: var(--signal-soft); }
+  .callout.calm { background: var(--blue-soft); }
+  .callout p { margin: 0; max-width: 68ch; }
+  .callout p + p { margin-top: 8px; }
+
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 24px; }
+
+  .table-wrap { margin-top: 28px; overflow-x: auto; }
+  table { width: 100%; min-width: 640px; border-collapse: collapse; font-size: 0.9375rem; }
+  th, td { text-align: left; padding: 12px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--mute); font-weight: 600; font-size: 0.875rem; }
+  td code { font-size: 0.875rem; }
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 0.8125rem; font-weight: 600; white-space: nowrap; }
+  .tag.kev { background: var(--signal); color: #fff; }
+  .tag.sev { background: var(--blue-soft); color: var(--blue); }
+  .muted { color: var(--mute); }
+  .files { margin: 12px 0 0; font-size: 0.875rem; color: var(--mute); }
+
+  .cta { margin-top: 48px; padding: clamp(24px, 4vw, 36px); border-radius: 22px; background: var(--surface); border: 1px solid var(--line); }
+  .cta h2 { margin: 0; font-size: 1.375rem; letter-spacing: -0.02em; }
+  .cta p { color: var(--mute); max-width: 62ch; }
+
+  .disclaimer { margin-top: 40px; color: var(--mute); font-size: 0.875rem; max-width: 72ch; }
+  footer { padding-block: 32px calc(32px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--line); color: var(--mute); font-size: 0.875rem; }
+  footer p { max-width: 1000px; margin: 0 auto; padding-inline: 20px; }
+
+  @media (prefers-reduced-motion: reduce) { .btn { transition: none; } }
+  @media (prefers-reduced-transparency: reduce) {
+    .nav { background: var(--paper); backdrop-filter: none; -webkit-backdrop-filter: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="../">Tocsio</a>
+    <a class="btn btn-small" href="../#inscription">Réserver mon accès</a>
+  </div>
+</header>
+
+<main>
+  <h1>Vos dépendances contiennent-elles une faille activement exploitée ?</h1>
+  <p class="lede">Collez l'adresse d'un dépôt GitHub public ou déposez vos fichiers de dépendances. Vous obtenez la liste de vos composants (SBOM), leurs vulnérabilités connues, et celles qui sont exploitées en ce moment selon le catalogue KEV de la CISA.</p>
+
+  <section class="input-card" aria-label="Lancer une analyse">
+    <h2>Dépôt GitHub public</h2>
+    <form class="row" id="repo-form" novalidate>
+      <label for="repo" class="visually-hidden">Adresse du dépôt GitHub</label>
+      <input id="repo" type="url" inputmode="url" placeholder="https://github.com/organisation/projet" autocomplete="off" required>
+      <button class="btn" type="submit" id="repo-btn">Analyser</button>
+    </form>
+
+    <div class="or">
+      <h2>Ou vos fichiers de dépendances</h2>
+      <label class="drop" id="drop">
+        <input type="file" id="files" multiple>
+        Déposez vos fichiers ici, ou cliquez pour les choisir
+      </label>
+      <p class="formats">Fichiers reconnus : package-lock.json, yarn.lock, pnpm-lock.yaml, requirements.txt, poetry.lock, Pipfile.lock, composer.lock, Cargo.lock, go.mod, Gemfile.lock, pom.xml, gradle.lockfile.</p>
+    </div>
+
+    <p class="privacy">L'analyse se fait dans votre navigateur. Vos fichiers ne sont envoyés nulle part : seuls les noms et versions des paquets sont transmis à la base publique de vulnérabilités OSV.dev.</p>
+  </section>
+
+  <p class="status" id="status" role="status" aria-live="polite"></p>
+
+  <section class="results" id="results" hidden aria-labelledby="r-title">
+    <h2 id="r-title">Résultat de l'analyse</h2>
+    <p class="meta" id="r-meta"></p>
+    <p class="files" id="r-files"></p>
+    <div class="stats">
+      <div class="stat"><b id="n-comp">0</b><span>composants analysés</span></div>
+      <div class="stat"><b id="n-vuln">0</b><span>composants avec une vulnérabilité connue</span></div>
+      <div class="stat" id="kev-stat"><b id="n-kev">0</b><span>failles activement exploitées</span></div>
+    </div>
+    <div id="callout"></div>
+    <div class="actions">
+      <button class="btn" type="button" id="dl-sbom">Télécharger le SBOM (CycloneDX)</button>
+    </div>
+    <div class="table-wrap" id="table-wrap"></div>
+  </section>
+
+  <section class="cta" aria-labelledby="t-cta">
+    <h2 id="t-cta">Une analyse ne suffit pas : les failles apparaissent après la publication</h2>
+    <p>Tocsio surveillera vos dépôts privés chaque jour, vous alertera dès qu'un composant devient activement exploité, lancera le compte à rebours de 24 heures et préparera votre déclaration à l'ENISA.</p>
+    <a class="btn" href="../#inscription">Réserver mon accès anticipé</a>
+  </section>
+
+  <p class="disclaimer">Cet outil donne une indication et ne constitue pas un audit ni un conseil juridique. Il ne voit que les dépendances déclarées dans les fichiers analysés. Données : <a href="https://osv.dev">OSV.dev</a> pour les vulnérabilités, <a href="https://www.cisa.gov/known-exploited-vulnerabilities-catalog">catalogue KEV de la CISA</a> pour les failles exploitées, copie mise à jour chaque jour. Pour comprendre vos obligations, lisez notre <a href="../cyber-resilience-act-editeurs/">guide du Cyber Resilience Act</a> ou faites le <a href="../test-cra/">test gratuit</a>.</p>
+</main>
+
+<footer>
+  <p>Tocsio est un projet en préparation. <a href="../">Retour à l'accueil</a></p>
+</footer>
+
+<script>
+"use strict";
+
+const OSV_BATCH = "https://api.osv.dev/v1/querybatch";
+const OSV_VULN = "https://api.osv.dev/v1/vulns/";
+const KEV_URL = "../data/kev.json";
+const MAX_LOCKFILES = 12;
+const MAX_DETAILS = 400;
+
+const $ = (id) => document.getElementById(id);
+const statusEl = $("status");
+let lastScan = null;
+
+function setStatus(text, isError = false) {
+  statusEl.textContent = text;
+  statusEl.className = "status" + (isError ? " err" : "");
+}
+
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+const looksLikeVersion = (v) => typeof v === "string" && /^v?\d/.test(v) && !v.includes("use.local");
+
+/* ---------- Parsers: each returns [{eco, name, version}] ---------- */
+
+function parsePackageLock(text) {
+  const j = JSON.parse(text);
+  const out = [];
+  if (j.packages) {
+    for (const [key, v] of Object.entries(j.packages)) {
+      const i = key.lastIndexOf("node_modules/");
+      if (i < 0 || !v || v.link) continue;
+      out.push({ eco: "npm", name: v.name || key.slice(i + 13), version: v.version });
+    }
+  } else if (j.dependencies) {
+    const walk = (deps) => {
+      for (const [name, v] of Object.entries(deps)) {
+        out.push({ eco: "npm", name, version: v.version });
+        if (v.dependencies) walk(v.dependencies);
+      }
+    };
+    walk(j.dependencies);
+  }
+  return out;
+}
+
+function parseYarnLock(text) {
+  const out = [];
+  let name = null;
+  for (const line of text.split(/\r?\n/)) {
+    if (!line || line.startsWith("#")) continue;
+    if (!/^\s/.test(line) && line.trimEnd().endsWith(":")) {
+      const first = line.trimEnd().slice(0, -1).split(",")[0].trim().replace(/^"|"$/g, "");
+      const at = first.lastIndexOf("@");
+      name = at > 0 ? first.slice(0, at) : null;
+      if (name && first.includes("@workspace:")) name = null;
+      continue;
+    }
+    const m = line.match(/^\s+version:?\s+"?([^"\s]+)"?\s*$/);
+    if (m && name) { out.push({ eco: "npm", name, version: m[1] }); name = null; }
+  }
+  return out;
+}
+
+function parsePnpmLock(text) {
+  const out = [];
+  let inPackages = false;
+  for (const line of text.split(/\r?\n/)) {
+    if (/^\S/.test(line)) { inPackages = /^(packages|snapshots):\s*$/.test(line); continue; }
+    if (!inPackages) continue;
+    const m = line.match(/^ {2}['"]?\/?([^'":\s][^'"]*?)['"]?:\s*$/);
+    if (!m) continue;
+    let key = m[1].replace(/\(.*$/, "");
+    let name, version;
+    const at = key.lastIndexOf("@");
+    if (at > 0) { name = key.slice(0, at); version = key.slice(at + 1); }
+    else { const slash = key.lastIndexOf("/"); name = key.slice(0, slash); version = key.slice(slash + 1); }
+    out.push({ eco: "npm", name, version });
+  }
+  return out;
+}
+
+function parseRequirements(text) {
+  const out = [];
+  for (const raw of text.split(/\r?\n/)) {
+    const line = raw.split("#")[0].trim();
+    const m = line.match(/^([A-Za-z0-9_.\-]+)(\[[^\]]*\])?\s*===?\s*([A-Za-z0-9_.+!\-]+)/);
+    if (m) out.push({ eco: "PyPI", name: m[1], version: m[3] });
+  }
+  return out;
+}
+
+function parseTomlPackages(text, eco) {
+  const out = [];
+  let cur = null;
+  const flush = () => { if (cur && cur.name && cur.version) out.push({ eco, name: cur.name, version: cur.version }); };
+  for (const line of text.split(/\r?\n/)) {
+    if (/^\s*\[\[package\]\]\s*$/.test(line)) { flush(); cur = {}; continue; }
+    if (/^\s*\[/.test(line)) { flush(); cur = null; continue; }
+    if (!cur) continue;
+    const m = line.match(/^\s*(name|version)\s*=\s*"([^"]+)"/);
+    if (m) cur[m[1]] = m[2];
+  }
+  flush();
+  return out;
+}
+
+function parsePipfileLock(text) {
+  const j = JSON.parse(text);
+  const out = [];
+  for (const section of ["default", "develop"]) {
+    for (const [name, v] of Object.entries(j[section] || {})) {
+      if (v && typeof v.version === "string") out.push({ eco: "PyPI", name, version: v.version.replace(/^==/, "") });
+    }
+  }
+  return out;
+}
+
+function parseComposerLock(text) {
+  const j = JSON.parse(text);
+  return [...(j.packages || []), ...(j["packages-dev"] || [])]
+    .filter((p) => p.name && p.version && !p.version.startsWith("dev-"))
+    .map((p) => ({ eco: "Packagist", name: p.name, version: p.version.replace(/^v/, "") }));
+}
+
+function parseGoMod(text) {
+  const out = [];
+  let inBlock = false;
+  for (const raw of text.split(/\r?\n/)) {
+    const line = raw.split("//")[0].trim();
+    if (/^require\s*\($/.test(line)) { inBlock = true; continue; }
+    if (inBlock && line === ")") { inBlock = false; continue; }
+    const m = inBlock ? line.match(/^(\S+)\s+(v\S+)$/) : line.match(/^require\s+(\S+)\s+(v\S+)$/);
+    if (m) out.push({ eco: "Go", name: m[1], version: m[2] });
+  }
+  return out;
+}
+
+function parseGemfileLock(text) {
+  const out = [];
+  let inSpecs = false;
+  for (const line of text.split(/\r?\n/)) {
+    if (/^\S/.test(line)) { inSpecs = false; continue; }
+    if (/^ {2}specs:\s*$/.test(line)) { inSpecs = true; continue; }
+    if (!inSpecs) continue;
+    const m = line.match(/^ {4}([A-Za-z0-9_.\-]+) \(([^)]+)\)\s*$/);
+    if (m) out.push({ eco: "RubyGems", name: m[1], version: m[2].replace(/-(x86|x64|arm|aarch|java|universal|mingw|darwin|linux|musl).*$/, "") });
+  }
+  return out;
+}
+
+function parsePom(text) {
+  const doc = new DOMParser().parseFromString(text, "application/xml");
+  const props = {};
+  const propsEl = doc.getElementsByTagName("properties")[0];
+  if (propsEl) for (const el of propsEl.children) props[el.tagName] = el.textContent.trim();
+  const projVersion = [...doc.documentElement.children].find((c) => c.tagName === "version");
+  if (projVersion) props["project.version"] = projVersion.textContent.trim();
+  const resolve = (v) => v && v.replace(/\$\{([^}]+)\}/g, (_, k) => props[k] ?? `\${${k}}`);
+  const out = [];
+  for (const dep of doc.getElementsByTagName("dependency")) {
+    const get = (tag) => { const el = [...dep.children].find((c) => c.tagName === tag); return el ? el.textContent.trim() : ""; };
+    const version = resolve(get("version"));
+    if (!version || version.includes("${")) continue;
+    out.push({ eco: "Maven", name: `${get("groupId")}:${get("artifactId")}`, version });
+  }
+  return out;
+}
+
+function parseGradleLock(text) {
+  const out = [];
+  for (const line of text.split(/\r?\n/)) {
+    const m = line.match(/^([^#:\s]+):([^:\s]+):([^=\s]+)=/);
+    if (m) out.push({ eco: "Maven", name: `${m[1]}:${m[2]}`, version: m[3] });
+  }
+  return out;
+}
+
+const PARSERS = {
+  "package-lock.json": parsePackageLock,
+  "npm-shrinkwrap.json": parsePackageLock,
+  "yarn.lock": parseYarnLock,
+  "pnpm-lock.yaml": parsePnpmLock,
+  "requirements.txt": parseRequirements,
+  "poetry.lock": (t) => parseTomlPackages(t, "PyPI"),
+  "Pipfile.lock": parsePipfileLock,
+  "composer.lock": parseComposerLock,
+  "Cargo.lock": (t) => parseTomlPackages(t, "crates.io"),
+  "go.mod": parseGoMod,
+  "Gemfile.lock": parseGemfileLock,
+  "pom.xml": parsePom,
+  "gradle.lockfile": parseGradleLock
+};
+
+function parserFor(path) {
+  const base = path.split("/").pop();
+  if (PARSERS[base]) return PARSERS[base];
+  if (/^requirements.*\.txt$/i.test(base)) return parseRequirements;
+  return null;
+}
+
+/* ---------- Sources ---------- */
+
+async function filesFromRepo(url) {
+  const m = url.trim().match(/^(?:https?:\/\/)?(?:www\.)?github\.com\/([^/\s]+)\/([^/\s#?]+)/i);
+  if (!m) throw new Error("Saisissez une adresse de la forme https://github.com/organisation/projet.");
+  const owner = m[1];
+  const repo = m[2].replace(/\.git$/, "");
+  setStatus(`Lecture du dépôt ${owner}/${repo}…`);
+  const api = async (path) => {
+    const r = await fetch(`https://api.github.com${path}`, { headers: { Accept: "application/vnd.github+json" } });
+    if (r.status === 404) throw new Error("Dépôt introuvable. Vérifiez l'adresse : seuls les dépôts publics peuvent être analysés ici.");
+    if (r.status === 403 || r.status === 429) throw new Error("Limite de requêtes GitHub atteinte pour votre connexion (60 par heure). Réessayez plus tard, ou déposez vos fichiers directement.");
+    if (!r.ok) throw new Error(`GitHub a répondu ${r.status}.`);
+    return r.json();
+  };
+  const info = await api(`/repos/${owner}/${repo}`);
+  const branch = info.default_branch;
+  const tree = await api(`/repos/${owner}/${repo}/git/trees/${encodeURIComponent(branch)}?recursive=1`);
+  const paths = tree.tree
+    .filter((n) => n.type === "blob" && parserFor(n.path) && !/(^|\/)(node_modules|vendor|test|tests|examples?|fixtures?)\//.test(n.path))
+    .map((n) => n.path)
+    .sort((a, b) => a.split("/").length - b.split("/").length)
+    .slice(0, MAX_LOCKFILES);
+  if (!paths.length) {
+    throw new Error("Aucun fichier de dépendances reconnu dans ce dépôt. Les fichiers de verrouillage (package-lock.json, poetry.lock…) donnent les versions exactes : s'ils ne sont pas versionnés, déposez-les ici directement.");
+  }
+  setStatus(`Téléchargement de ${paths.length} fichier${paths.length > 1 ? "s" : ""} de dépendances…`);
+  const files = await Promise.all(paths.map(async (path) => {
+    const r = await fetch(`https://raw.githubusercontent.com/${owner}/${repo}/${encodeURIComponent(branch)}/${path.split("/").map(encodeURIComponent).join("/")}`);
+    if (!r.ok) throw new Error(`Impossible de lire ${path}.`);
+    return { path, text: await r.text() };
+  }));
+  return { label: `${owner}/${repo}`, ref: `branche ${branch}`, truncated: !!tree.truncated, files };
+}
+
+async function filesFromUpload(fileList) {
+  const files = [];
+  for (const f of fileList) files.push({ path: f.name, text: await f.text() });
+  return { label: files.length === 1 ? files[0].path : `${files.length} fichiers`, ref: "fichiers déposés", truncated: false, files };
+}
+
+/* ---------- Vulnerability lookups ---------- */
+
+let kevPromise = null;
+function loadKev() {
+  kevPromise ??= fetch(KEV_URL).then((r) => { if (!r.ok) throw new Error("kev"); return r.json(); });
+  return kevPromise;
+}
+
+async function queryOsv(components) {
+  const ids = components.map(() => []);
+  for (let start = 0; start < components.length; start += 1000) {
+    const slice = components.slice(start, start + 1000);
+    const r = await fetch(OSV_BATCH, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ queries: slice.map((c) => ({ package: { name: c.name, ecosystem: c.eco }, version: c.version.replace(/^v(?=\d)/, c.eco === "Go" ? "v" : "") })) })
+    });
+    if (!r.ok) throw new Error("La base OSV.dev n'a pas répondu. Réessayez dans un instant.");
+    const data = await r.json();
+    data.results.forEach((res, i) => { ids[start + i] = (res.vulns || []).map((v) => v.id); });
+  }
+  return ids;
+}
+
+async function fetchDetails(idList) {
+  const details = new Map();
+  let next = 0;
+  const worker = async () => {
+    while (next < idList.length) {
+      const id = idList[next++];
+      try {
+        const r = await fetch(OSV_VULN + encodeURIComponent(id));
+        if (r.ok) details.set(id, await r.json());
+      } catch { /* keep going: one missing detail should not fail the scan */ }
+    }
+  };
+  await Promise.all(Array.from({ length: 8 }, worker));
+  return details;
+}
+
+function fixedVersions(vuln, comp) {
+  const fixed = new Set();
+  for (const a of vuln.affected || []) {
+    if (!a.package || a.package.name.toLowerCase() !== comp.name.toLowerCase()) continue;
+    for (const range of a.ranges || []) for (const e of range.events || []) if (e.fixed) fixed.add(e.fixed);
+  }
+  return [...fixed];
+}
+
+const SEV_ORDER = { CRITICAL: 4, HIGH: 3, MODERATE: 2, MEDIUM: 2, LOW: 1 };
+const SEV_FR = { CRITICAL: "Critique", HIGH: "Élevée", MODERATE: "Moyenne", MEDIUM: "Moyenne", LOW: "Faible" };
+
+/* ---------- Main scan ---------- */
+
+async function scan(getSource) {
+  const btn = $("repo-btn");
+  btn.disabled = true;
+  $("results").hidden = true;
+  try {
+    const source = await getSource();
+    const kev = loadKev().catch(() => null);
+
+    const seen = new Map();
+    const usedFiles = [];
+    for (const f of source.files) {
+      const parse = parserFor(f.path);
+      if (!parse) continue;
+      let comps = [];
+      try { comps = parse(f.text); } catch { continue; }
+      comps = comps.filter((c) => c.name && looksLikeVersion(c.version));
+      usedFiles.push(`${f.path} (${comps.length})`);
+      for (const c of comps) seen.set(`${c.eco}|${c.name.toLowerCase()}|${c.version}`, c);
+    }
+    const components = [...seen.values()];
+    if (!components.length) throw new Error("Aucun composant avec une version exacte n'a été trouvé dans ces fichiers.");
+
+    setStatus(`Recherche des vulnérabilités pour ${components.length} composants…`);
+    const idsPer = await queryOsv(components);
+    const allIds = [...new Set(idsPer.flat())];
+    const detailIds = allIds.slice(0, MAX_DETAILS);
+    setStatus(`Lecture de ${detailIds.length} avis de sécurité…`);
+    const details = await fetchDetails(detailIds);
+    const kevData = await kev;
+    const kevCves = kevData ? kevData.cves : {};
+
+    const findings = [];
+    components.forEach((comp, i) => {
+      for (const id of idsPer[i]) {
+        const v = details.get(id);
+        const aliases = [id, ...((v && v.aliases) || [])];
+        const cves = aliases.filter((a) => /^CVE-/.test(a));
+        const kevHit = cves.find((c) => kevCves[c]);
+        const sevRaw = v && v.database_specific && typeof v.database_specific.severity === "string" ? v.database_specific.severity.toUpperCase() : "";
+        findings.push({
+          comp, id, cves,
+          kev: kevHit ? { cve: kevHit, name: kevCves[kevHit][0], added: kevCves[kevHit][1], ransomware: kevCves[kevHit][2] === "Known" } : null,
+          summary: (v && (v.summary || (v.details || "").split("\n")[0])) || "",
+          sev: sevRaw,
+          fixed: v ? fixedVersions(v, comp) : []
+        });
+      }
+    });
+
+    // One row per vulnerability: an advisory can appear under several ids (GHSA, PYSEC…) that share a CVE.
+    const dedup = new Map();
+    for (const f of findings) {
+      const key = `${f.comp.eco}|${f.comp.name}|${f.comp.version}|${f.cves[0] || f.id}`;
+      const prev = dedup.get(key);
+      if (!prev || (f.kev && !prev.kev) || (SEV_ORDER[f.sev] || 0) > (SEV_ORDER[prev.sev] || 0)) dedup.set(key, f);
+    }
+    const rows = [...dedup.values()].sort((a, b) =>
+      (b.kev ? 1 : 0) - (a.kev ? 1 : 0) || (SEV_ORDER[b.sev] || 0) - (SEV_ORDER[a.sev] || 0) || a.comp.name.localeCompare(b.comp.name));
+
+    lastScan = { source, components };
+    render(source, usedFiles, components, rows, kevData, allIds.length > MAX_DETAILS);
+    setStatus("");
+  } catch (e) {
+    setStatus(e.message || "L'analyse a échoué.", true);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function render(source, usedFiles, components, rows, kevData, partial) {
+  const vulnerable = new Set(rows.map((r) => `${r.comp.eco}|${r.comp.name}|${r.comp.version}`));
+  const kevRows = rows.filter((r) => r.kev);
+  $("r-meta").textContent = `${source.label}, ${source.ref}. Analyse du ${new Date().toLocaleString("fr-FR")}.` + (kevData ? ` Catalogue KEV du ${kevData.catalogVersion}.` : "");
+  $("r-files").textContent = "Fichiers analysés : " + usedFiles.join(", ") + (source.truncated ? ". Le dépôt est très grand : certains fichiers n'ont peut-être pas été lus." : "");
+  $("n-comp").textContent = components.length;
+  $("n-vuln").textContent = vulnerable.size;
+  $("n-kev").textContent = kevRows.length;
+  $("kev-stat").className = "stat" + (kevRows.length ? " hot" : "");
+
+  let callout = "";
+  if (!kevData) {
+    callout = `<div class="callout calm"><p>Le catalogue des failles exploitées n'a pas pu être chargé : seules les vulnérabilités connues sont affichées.</p></div>`;
+  } else if (kevRows.length) {
+    callout = `<div class="callout"><p><strong>${kevRows.length} faille${kevRows.length > 1 ? "s" : ""} de vos dépendances ${kevRows.length > 1 ? "sont" : "est"} activement exploitée${kevRows.length > 1 ? "s" : ""}.</strong> Cela ne veut pas dire que votre produit est forcément touché : vérifiez si le code vulnérable est utilisé.</p><p>Si c'est le cas et que vous distribuez ce logiciel dans l'Union, l'article 14 du Cyber Resilience Act impose une alerte précoce à l'ENISA dans les 24 heures.</p></div>`;
+  } else {
+    callout = `<div class="callout calm"><p>Aucune faille activement exploitée dans ces dépendances aujourd'hui. Cela peut changer à tout moment : une faille connue peut être ajoutée au catalogue KEV demain.</p></div>`;
+  }
+  if (partial) callout += `<div class="callout calm"><p>Beaucoup d'avis de sécurité concernent ce projet : seuls les ${MAX_DETAILS} premiers ont été détaillés.</p></div>`;
+  $("callout").innerHTML = callout;
+
+  if (!rows.length) {
+    $("table-wrap").innerHTML = "";
+  } else {
+    $("table-wrap").innerHTML = `<table>
+      <thead><tr><th scope="col">Composant</th><th scope="col">Vulnérabilité</th><th scope="col">Gravité</th><th scope="col">Corrigé en</th></tr></thead>
+      <tbody>${rows.map((r) => `<tr>
+        <td><strong>${esc(r.comp.name)}</strong><br><code>${esc(r.comp.version)}</code> <span class="muted">${esc(r.comp.eco)}</span></td>
+        <td>${r.kev ? `<span class="tag kev">Activement exploitée</span> ` : ""}<a href="https://osv.dev/vulnerability/${encodeURIComponent(r.id)}">${esc(r.cves[0] || r.id)}</a>${r.summary ? `<br><span class="muted">${esc(r.summary.slice(0, 160))}</span>` : ""}${r.kev && r.kev.ransomware ? `<br><span class="muted">Utilisée dans des campagnes de rançongiciel.</span>` : ""}</td>
+        <td>${r.sev ? `<span class="tag sev">${esc(SEV_FR[r.sev] || r.sev)}</span>` : `<span class="muted">Non précisée</span>`}</td>
+        <td>${r.fixed.length ? `<code>${esc(r.fixed.slice(-1)[0])}</code>` : `<span class="muted">Pas de correctif indiqué</span>`}</td>
+      </tr>`).join("")}</tbody></table>`;
+  }
+  $("results").hidden = false;
+  $("results").scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+}
+
+/* ---------- SBOM export (CycloneDX 1.5) ---------- */
+
+function purl(c) {
+  const enc = encodeURIComponent;
+  switch (c.eco) {
+    case "npm": return c.name.startsWith("@") ? `pkg:npm/${enc(c.name.split("/")[0])}/${enc(c.name.split("/")[1])}@${enc(c.version)}` : `pkg:npm/${enc(c.name)}@${enc(c.version)}`;
+    case "PyPI": return `pkg:pypi/${enc(c.name.toLowerCase())}@${enc(c.version)}`;
+    case "Packagist": return `pkg:composer/${c.name.split("/").map(enc).join("/")}@${enc(c.version)}`;
+    case "crates.io": return `pkg:cargo/${enc(c.name)}@${enc(c.version)}`;
+    case "Go": return `pkg:golang/${c.name.split("/").map(enc).join("/")}@${enc(c.version)}`;
+    case "RubyGems": return `pkg:gem/${enc(c.name)}@${enc(c.version)}`;
+    case "Maven": { const [g, a] = c.name.split(":"); return `pkg:maven/${enc(g)}/${enc(a)}@${enc(c.version)}`; }
+    default: return "";
+  }
+}
+
+$("dl-sbom").addEventListener("click", () => {
+  if (!lastScan) return;
+  const bom = {
+    bomFormat: "CycloneDX",
+    specVersion: "1.5",
+    serialNumber: `urn:uuid:${crypto.randomUUID()}`,
+    version: 1,
+    metadata: {
+      timestamp: new Date().toISOString(),
+      tools: { components: [{ type: "application", name: "Tocsio scanner", publisher: "Tocsio" }] },
+      component: { type: "application", name: lastScan.source.label }
+    },
+    components: lastScan.components.map((c) => ({ type: "library", name: c.name, version: c.version, purl: purl(c) }))
+  };
+  const blob = new Blob([JSON.stringify(bom, null, 2)], { type: "application/vnd.cyclonedx+json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `sbom-${lastScan.source.label.replace(/[^\w.-]+/g, "-")}.cdx.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+});
+
+/* ---------- Wiring ---------- */
+
+$("repo-form").addEventListener("submit", (e) => {
+  e.preventDefault();
+  scan(() => filesFromRepo($("repo").value));
+});
+
+const drop = $("drop");
+const filesInput = $("files");
+filesInput.addEventListener("change", () => { if (filesInput.files.length) scan(() => filesFromUpload(filesInput.files)); });
+["dragenter", "dragover"].forEach((t) => drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.add("over"); }));
+["dragleave", "drop"].forEach((t) => drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.remove("over"); }));
+drop.addEventListener("drop", (e) => { if (e.dataTransfer.files.length) scan(() => filesFromUpload(e.dataTransfer.files)); });
+
+const params = new URLSearchParams(location.search);
+if (params.get("repo")) { $("repo").value = params.get("repo"); scan(() => filesFromRepo(params.get("repo"))); }
+</script>
+</body>
+</html>
