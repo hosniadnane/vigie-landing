@@ -221,6 +221,7 @@
 
 <script type="module">
 import { extractComponents, findLockfilePaths } from "../shared/parsers.js";
+import { pickFixedVersion } from "../shared/versions.js";
 
 const OSV_BATCH = "https://api.osv.dev/v1/querybatch";
 const OSV_VULN = "https://api.osv.dev/v1/vulns/";
@@ -425,7 +426,7 @@ function render(source, usedFiles, components, rows, kevData, partial) {
         <td><strong>${esc(r.comp.name)}</strong><br><code>${esc(r.comp.version)}</code> <span class="muted">${esc(r.comp.eco)}</span></td>
         <td>${r.kev ? `<span class="tag kev">Activement exploitée</span> ` : ""}<a href="https://osv.dev/vulnerability/${encodeURIComponent(r.id)}">${esc(r.cves[0] || r.id)}</a>${r.summary ? `<br><span class="muted">${esc(r.summary.slice(0, 160))}</span>` : ""}${r.kev && r.kev.ransomware ? `<br><span class="muted">Utilisée dans des campagnes de rançongiciel.</span>` : ""}</td>
         <td>${r.sev ? `<span class="tag sev">${esc(SEV_FR[r.sev] || r.sev)}</span>` : `<span class="muted">Non précisée</span>`}</td>
-        <td>${r.fixed.length ? `<code>${esc(r.fixed.slice(-1)[0])}</code>` : `<span class="muted">Pas de correctif indiqué</span>`}</td>
+        <td>${pickFixedVersion(r.comp.version, r.fixed) ? `<code>${esc(pickFixedVersion(r.comp.version, r.fixed))}</code>` : `<span class="muted">Pas de correctif indiqué</span>`}</td>
       </tr>`).join("")}</tbody></table>`;
   }
   $("results").hidden = false;
