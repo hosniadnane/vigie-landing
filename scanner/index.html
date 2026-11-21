@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Scanner gratuit : SBOM et failles activement exploitées dans vos dépendances</title>
-<meta name="description" content="Analysez gratuitement un dépôt GitHub public ou un fichier de dépendances : nomenclature logicielle (SBOM CycloneDX), vulnérabilités connues et failles activement exploitées selon le catalogue KEV de la CISA. Analyse dans votre navigateur.">
+<meta name="description" content="Analysez gratuitement un dépôt GitHub public ou un fichier de dépendances : nomenclature logicielle (SBOM CycloneDX), vulnérabilités connues et failles activement exploitées selon les catalogues de la CISA et de l'ENISA. Analyse dans votre navigateur.">
 <link rel="canonical" href="https://hosniadnane.github.io/vigie-landing/scanner/">
 <script type="application/ld+json">
 {
@@ -166,7 +166,7 @@
 
 <main>
   <h1>Vos dépendances contiennent-elles une faille activement exploitée ?</h1>
-  <p class="lede">Collez l'adresse d'un dépôt GitHub public ou déposez vos fichiers de dépendances. Vous obtenez la liste de vos composants (SBOM), leurs vulnérabilités connues, et celles qui sont exploitées en ce moment selon le catalogue KEV de la CISA.</p>
+  <p class="lede">Collez l'adresse d'un dépôt GitHub public ou déposez vos fichiers de dépendances. Vous obtenez la liste de vos composants (SBOM), leurs vulnérabilités connues, et celles qui sont exploitées en ce moment selon les catalogues de la CISA et de l'ENISA.</p>
 
   <section class="input-card" aria-label="Lancer une analyse">
     <h2>Dépôt GitHub public</h2>
@@ -212,7 +212,7 @@
     <a class="btn" href="../#inscription">Réserver mon accès anticipé</a>
   </section>
 
-  <p class="disclaimer">Cet outil donne une indication et ne constitue pas un audit ni un conseil juridique. Il ne voit que les dépendances déclarées dans les fichiers analysés. Données : <a href="https://osv.dev">OSV.dev</a> pour les vulnérabilités, <a href="https://www.cisa.gov/known-exploited-vulnerabilities-catalog">catalogue KEV de la CISA</a> pour les failles exploitées, copie mise à jour chaque jour. Pour comprendre vos obligations, lisez notre <a href="../cyber-resilience-act-editeurs/">guide du Cyber Resilience Act</a> ou faites le <a href="../test-cra/">test gratuit</a>.</p>
+  <p class="disclaimer">Cet outil donne une indication et ne constitue pas un audit ni un conseil juridique. Il ne voit que les dépendances déclarées dans les fichiers analysés. Données : <a href="https://osv.dev">OSV.dev</a> pour les vulnérabilités, <a href="https://www.cisa.gov/known-exploited-vulnerabilities-catalog">catalogue KEV de la CISA</a> et <a href="https://euvd.enisa.europa.eu/">catalogue européen de l'ENISA</a> pour les failles exploitées, copie mise à jour chaque jour. Pour comprendre vos obligations, lisez notre <a href="../cyber-resilience-act-editeurs/">guide du Cyber Resilience Act</a> ou faites le <a href="../test-cra/">test gratuit</a>.</p>
 </main>
 
 <footer>
@@ -368,7 +368,7 @@ async function scan(getSource) {
         const sevRaw = v && v.database_specific && typeof v.database_specific.severity === "string" ? v.database_specific.severity.toUpperCase() : "";
         findings.push({
           comp, id, cves,
-          kev: kevHit ? { cve: kevHit, name: kevCves[kevHit][0], added: kevCves[kevHit][1], ransomware: kevCves[kevHit][2] === "Known" } : null,
+          kev: kevHit ? { cve: kevHit, name: kevCves[kevHit][0], added: kevCves[kevHit][1], ransomware: kevCves[kevHit][2] === "Known", sources: { C: "CISA", E: "ENISA", CE: "CISA et ENISA" }[kevCves[kevHit][3]] || "CISA", euvd: kevCves[kevHit][4] || "" } : null,
           summary: (v && (v.summary || (v.details || "").split("\n")[0])) || "",
           sev: sevRaw,
           fixed: v ? fixedVersions(v, comp) : []
@@ -412,7 +412,7 @@ function render(source, usedFiles, components, rows, kevData, partial) {
   } else if (kevRows.length) {
     callout = `<div class="callout"><p><strong>${kevRows.length} faille${kevRows.length > 1 ? "s" : ""} de vos dépendances ${kevRows.length > 1 ? "sont" : "est"} activement exploitée${kevRows.length > 1 ? "s" : ""}.</strong> Cela ne veut pas dire que votre produit est forcément touché : vérifiez si le code vulnérable est utilisé.</p><p>Si c'est le cas et que vous distribuez ce logiciel dans l'Union, l'article 14 du Cyber Resilience Act impose une alerte précoce à l'ENISA dans les 24 heures.</p></div>`;
   } else {
-    callout = `<div class="callout calm"><p>Aucune faille activement exploitée dans ces dépendances aujourd'hui. Cela peut changer à tout moment : une faille connue peut être ajoutée au catalogue KEV demain.</p></div>`;
+    callout = `<div class="callout calm"><p>Aucune faille activement exploitée dans ces dépendances aujourd'hui. Cela peut changer à tout moment : une faille connue peut être ajoutée demain au catalogue de la CISA ou de l'ENISA.</p></div>`;
   }
   if (partial) callout += `<div class="callout calm"><p>Beaucoup d'avis de sécurité concernent ce projet : seuls les ${MAX_DETAILS} premiers ont été détaillés.</p></div>`;
   $("callout").innerHTML = callout;
@@ -424,7 +424,7 @@ function render(source, usedFiles, components, rows, kevData, partial) {
       <thead><tr><th scope="col">Composant</th><th scope="col">Vulnérabilité</th><th scope="col">Gravité</th><th scope="col">Corrigé en</th></tr></thead>
       <tbody>${rows.map((r) => `<tr>
         <td><strong>${esc(r.comp.name)}</strong><br><code>${esc(r.comp.version)}</code> <span class="muted">${esc(r.comp.eco)}</span></td>
-        <td>${r.kev ? `<span class="tag kev">Activement exploitée</span> ` : ""}<a href="https://osv.dev/vulnerability/${encodeURIComponent(r.id)}">${esc(r.cves[0] || r.id)}</a>${r.summary ? `<br><span class="muted">${esc(r.summary.slice(0, 160))}</span>` : ""}${r.kev && r.kev.ransomware ? `<br><span class="muted">Utilisée dans des campagnes de rançongiciel.</span>` : ""}</td>
+        <td>${r.kev ? `<span class="tag kev">Activement exploitée</span> <span class="muted">${esc(r.kev.sources)}${r.kev.euvd ? `, ${esc(r.kev.euvd)}` : ""}</span><br>` : ""}<a href="https://osv.dev/vulnerability/${encodeURIComponent(r.id)}">${esc(r.cves[0] || r.id)}</a>${r.summary ? `<br><span class="muted">${esc(r.summary.slice(0, 160))}</span>` : ""}${r.kev && r.kev.ransomware ? `<br><span class="muted">Utilisée dans des campagnes de rançongiciel.</span>` : ""}</td>
         <td>${r.sev ? `<span class="tag sev">${esc(SEV_FR[r.sev] || r.sev)}</span>` : `<span class="muted">Non précisée</span>`}</td>
         <td>${pickFixedVersion(r.comp.version, r.fixed) ? `<code>${esc(pickFixedVersion(r.comp.version, r.fixed))}</code>` : `<span class="muted">Pas de correctif indiqué</span>`}</td>
       </tr>`).join("")}</tbody></table>`;
