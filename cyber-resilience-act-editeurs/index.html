@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cyber Resilience Act : obligations des éditeurs de logiciels en 2026 et 2027</title>
+<meta name="description" content="Guide pratique du Cyber Resilience Act pour les éditeurs : produits concernés, déclaration des failles en 24 heures depuis le 11 septembre 2026, règles pour les petites entreprises, obligations au 11 décembre 2027 et sanctions.">
+<link rel="canonical" href="https://hosniadnane.github.io/vigie-landing/cyber-resilience-act-editeurs/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:title" content="Cyber Resilience Act : ce que doivent faire les éditeurs de logiciels, et quand">
+<meta property="og:description" content="Déclaration des failles en 24 heures, règles pour les TPE et petites entreprises, obligations au 11 décembre 2027 et sanctions.">
+<meta property="og:url" content="https://hosniadnane.github.io/vigie-landing/cyber-resilience-act-editeurs/">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "Cyber Resilience Act : ce que doivent faire les éditeurs de logiciels, et quand",
+  "inLanguage": "fr",
+  "datePublished": "2026-11-21",
+  "dateModified": "2026-11-21",
+  "mainEntityOfPage": "https://hosniadnane.github.io/vigie-landing/cyber-resilience-act-editeurs/"
+}
+</script>
+<style>
+  :root {
+    --paper: #FBFBFD;
+    --surface: #FFFFFF;
+    --ink: #1D1D1F;
+    --mute: #6E6E73;
+    --line: #E3E3E8;
+    --blue: #0B3B8C;
+    --blue-soft: #EEF2FA;
+    --signal: #C8322B;
+    --nav: rgba(251, 251, 253, 0.72);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #0F1012;
+      --surface: #17181B;
+      --ink: #F5F5F7;
+      --mute: #A1A1A6;
+      --line: #2C2D31;
+      --blue: #7FA6F0;
+      --blue-soft: #18213A;
+      --signal: #FF6B5E;
+      --nav: rgba(15, 16, 18, 0.72);
+      color-scheme: dark;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font: 100%/1.65 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-optical-sizing: auto;
+  }
+  a { color: var(--blue); }
+  :focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; border-radius: 6px; }
+
+  .nav {
+    position: sticky; top: 0; z-index: 10;
+    padding-top: env(safe-area-inset-top, 0px);
+    background: var(--nav);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+  }
+  .nav-inner { max-width: 1040px; margin: 0 auto; padding-inline: 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; height: 56px; }
+  .brand { font-weight: 650; font-size: 1.125rem; letter-spacing: -0.01em; color: var(--ink); text-decoration: none; }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-height: 44px; padding: 0 20px; border-radius: 999px;
+    background: var(--blue); color: #fff; font-weight: 600; text-decoration: none;
+    transition: transform 100ms ease-out, opacity 150ms ease;
+  }
+  .btn:hover { opacity: 0.92; }
+  .btn:active { transform: scale(0.97); }
+  .btn-small { min-height: 34px; padding: 0 14px; font-size: 0.875rem; }
+  @media (prefers-color-scheme: dark) { .btn { color: #0F1012; } }
+
+  article { max-width: 720px; margin: 0 auto; padding: clamp(48px, 8vw, 88px) 20px clamp(56px, 8vw, 96px); }
+  h1 {
+    margin: 0;
+    font-size: clamp(2rem, 5vw, 3.25rem);
+    line-height: 1.08;
+    letter-spacing: -0.032em;
+    font-weight: 700;
+  }
+  .meta { margin: 18px 0 0; color: var(--mute); font-size: 0.9375rem; }
+  .chapo { margin: 28px 0 0; font-size: 1.1875rem; line-height: 1.55; color: var(--ink); }
+  h2 {
+    margin: 56px 0 0;
+    font-size: clamp(1.5rem, 3vw, 1.875rem);
+    line-height: 1.15;
+    letter-spacing: -0.024em;
+  }
+  h3 { margin: 32px 0 0; font-size: 1.125rem; letter-spacing: -0.01em; }
+  p, li { max-width: 68ch; }
+  p { margin: 16px 0 0; }
+  ul, ol { margin: 16px 0 0; padding-left: 1.2em; }
+  li + li { margin-top: 8px; }
+
+  .table-wrap { margin-top: 20px; overflow-x: auto; }
+  table { width: 100%; min-width: 520px; border-collapse: collapse; font-size: 0.9375rem; }
+  th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-weight: 600; color: var(--mute); }
+  td.first { color: var(--signal); font-weight: 650; }
+
+  .callout {
+    margin-top: 24px; padding: 20px 22px;
+    border-radius: 16px; background: var(--blue-soft);
+  }
+  .callout p { margin: 0; }
+  .callout p + p { margin-top: 10px; }
+
+  .cta {
+    margin-top: 64px; padding: clamp(24px, 4vw, 36px);
+    border-radius: 22px; background: var(--surface); border: 1px solid var(--line);
+  }
+  .cta h2 { margin: 0; font-size: 1.375rem; }
+  .cta p { color: var(--mute); }
+  .cta .btn { margin-top: 20px; }
+
+  .sources { margin-top: 56px; font-size: 0.9375rem; color: var(--mute); }
+  .sources h2 { font-size: 1.125rem; margin-top: 0; color: var(--ink); }
+
+  footer { padding-block: 32px calc(32px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--line); color: var(--mute); font-size: 0.875rem; }
+  footer p { max-width: 1000px; margin: 0 auto; padding-inline: 20px; }
+
+  @media (prefers-reduced-motion: reduce) { .btn { transition: none; } }
+  @media (prefers-reduced-transparency: reduce) {
+    .nav { background: var(--paper); backdrop-filter: none; -webkit-backdrop-filter: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="../">Vigie</a>
+    <a class="btn btn-small" href="../#inscription">Réserver mon accès</a>
+  </div>
+</header>
+
+<main>
+<article>
+  <h1>Cyber Resilience Act : ce que doivent faire les éditeurs de logiciels, et quand</h1>
+  <p class="meta">Mis à jour le 21 novembre 2026. Lecture : 7 minutes.</p>
+
+  <p class="chapo">Le Cyber Resilience Act (règlement (UE) 2024/2847) traite le logiciel comme un produit réglementé. Une partie s'applique déjà : depuis le 11 septembre 2026, un éditeur doit déclarer toute faille activement exploitée dans ses produits. Le reste devient obligatoire le 11 décembre 2027. Voici ce que cela change pour une petite équipe, dans l'ordre où cela arrive.</p>
+
+  <h2>Votre logiciel est-il concerné ?</h2>
+  <p>Le règlement vise les « produits comportant des éléments numériques » mis à disposition sur le marché européen. Pour un éditeur, cela couvre en pratique :</p>
+  <ul>
+    <li>les logiciels installés chez le client : applications de bureau, outils en ligne de commande, applications mobiles ;</li>
+    <li>les plugins, extensions et bibliothèques vendus commercialement ;</li>
+    <li>les firmwares et logiciels embarqués dans des objets connectés.</li>
+  </ul>
+  <p>Le règlement ne prévoit aucun seuil de taille. Une entreprise de trois personnes qui vend un logiciel dans l'Union est concernée.</p>
+
+  <h3>Les principales exclusions</h3>
+  <ul>
+    <li><strong>Le SaaS pur.</strong> Un service accessible uniquement en ligne sort en général du champ. Le traitement de données à distance n'est couvert que s'il fait partie d'un produit, par exemple le cloud qui fait fonctionner une application installée.</li>
+    <li><strong>L'open source non commercial.</strong> Un logiciel libre publié sans activité commerciale n'est pas concerné. Les fondations qui soutiennent durablement des projets libres, appelées « stewards », relèvent d'un régime allégé.</li>
+    <li><strong>Les produits déjà régis par un texte sectoriel</strong>, comme les dispositifs médicaux, les véhicules ou l'aviation.</li>
+  </ul>
+  <p>Si vous éditez un SaaS, le CRA vous concerne peu, mais vos clients soumis à DORA (banques, assurances) ou à NIS2 peuvent vous imposer des exigences de sécurité par contrat.</p>
+
+  <h2>Depuis le 11 septembre 2026 : déclarer les failles exploitées</h2>
+  <p>L'article 14 impose de signaler deux types d'événements, via la plateforme unique de signalement de l'ENISA, à destination du CSIRT coordinateur de votre État membre et de l'ENISA.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th scope="col">Événement</th><th scope="col">Alerte précoce</th><th scope="col">Notification</th><th scope="col">Rapport final</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Vulnérabilité activement exploitée</td><td class="first">24 heures</td><td>72 heures</td><td>14 jours après la mise à disposition d'un correctif</td></tr>
+        <tr><td>Incident grave affectant la sécurité du produit</td><td class="first">24 heures</td><td>72 heures</td><td>1 mois après la notification</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>Les délais courent à partir du moment où vous avez connaissance de l'événement. L'obligation vaut aussi pour les versions déjà installées chez vos clients avant septembre 2026.</p>
+  <p>Vous devez aussi informer les utilisateurs concernés, et si besoin leur indiquer les mesures à prendre pour se protéger.</p>
+
+  <h2>Le cas des TPE et petites entreprises</h2>
+  <p>L'obligation de déclarer s'applique quelle que soit la taille de l'entreprise. Le règlement prévoit toutefois un aménagement sur les sanctions.</p>
+  <div class="callout">
+    <p>Selon l'article 64, paragraphe 10, les microentreprises et les petites entreprises (moins de 50 salariés et 10 millions d'euros de chiffre d'affaires ou de bilan) ne peuvent pas recevoir d'amende administrative pour avoir manqué le délai de 24 heures de l'alerte précoce.</p>
+    <p>Cette exception ne couvre que ce délai. La déclaration reste obligatoire, tout comme la notification à 72 heures et le rapport final.</p>
+  </div>
+  <p>Les autorités doivent aussi tenir compte de la taille de l'entreprise pour fixer le montant des autres sanctions.</p>
+
+  <h2>Au 11 décembre 2027 : prouver la sécurité de vos produits</h2>
+  <p>À partir de cette date, tout le règlement s'applique. Pour chaque produit, l'éditeur devra :</p>
+  <ol>
+    <li><strong>Respecter les exigences essentielles</strong> de l'annexe I : pas de vulnérabilité exploitable connue à la mise sur le marché, configuration sécurisée par défaut, protection des données, réduction de la surface d'attaque.</li>
+    <li><strong>Gérer les vulnérabilités</strong> : tenir une nomenclature logicielle (SBOM) des composants, corriger sans délai, publier une politique de divulgation coordonnée et un point de contact pour les signalements.</li>
+    <li><strong>Fournir des mises à jour de sécurité gratuites</strong> pendant une période de support d'au moins cinq ans, sauf si le produit est prévu pour une durée d'utilisation plus courte (article 13, paragraphe 8). Chaque mise à jour doit rester disponible au moins dix ans (article 13, paragraphe 9).</li>
+    <li><strong>Rédiger la documentation technique</strong> décrite à l'annexe VII, dont l'analyse des risques de cybersécurité.</li>
+    <li><strong>Évaluer la conformité</strong>, le plus souvent par auto-évaluation. Certains produits classés « importants » ou « critiques » exigent des normes harmonisées ou un organisme tiers.</li>
+    <li><strong>Signer la déclaration UE de conformité</strong> et apposer le <strong>marquage CE</strong>.</li>
+  </ol>
+
+  <h2>Les sanctions</h2>
+  <p>Pour un manquement aux exigences essentielles ou aux obligations des articles 13 et 14, l'amende peut atteindre 15 millions d'euros ou 2,5 % du chiffre d'affaires annuel mondial, le montant le plus élevé étant retenu. Les autorités de surveillance du marché peuvent aussi exiger le retrait ou le rappel d'un produit non conforme.</p>
+
+  <h2>Par où commencer cette semaine</h2>
+  <ol>
+    <li><strong>Listez vos produits et leurs versions en circulation</strong>, y compris celles qui ne sont plus vendues mais encore utilisées.</li>
+    <li><strong>Générez un SBOM par version</strong>, avec un outil open source comme Syft ou les générateurs CycloneDX.</li>
+    <li><strong>Surveillez vos composants</strong> face aux vulnérabilités activement exploitées, par exemple le catalogue KEV de la CISA et la base OSV.</li>
+    <li><strong>Préparez la procédure des 24 heures</strong> : qui déclare, avec quel accès à la plateforme de l'ENISA, et quel modèle d'alerte.</li>
+    <li><strong>Publiez une politique de divulgation</strong> et un fichier security.txt, pour que les chercheurs sachent où vous signaler une faille.</li>
+  </ol>
+
+  <section class="cta" aria-labelledby="t-cta">
+    <h2 id="t-cta">Vigie automatise ces cinq étapes</h2>
+    <p>Connectez votre dépôt : Vigie génère le SBOM à chaque version, surveille les failles exploitées, lance le compte à rebours de 24 heures et prépare vos documents en français.</p>
+    <a class="btn" href="../#inscription">Réserver mon accès anticipé</a>
+  </section>
+
+  <section class="sources" aria-labelledby="t-sources">
+    <h2 id="t-sources">Sources</h2>
+    <ul>
+      <li><a href="https://eur-lex.europa.eu/eli/reg/2024/2847/oj">Règlement (UE) 2024/2847 (Cyber Resilience Act), EUR-Lex</a></li>
+      <li><a href="https://www.enisa.europa.eu/topics/awareness-and-cyber-hygiene/sme-cyber-resilience-act-survey">ENISA, enquête sur la préparation des PME au CRA</a></li>
+    </ul>
+    <p>Cet article est un guide pratique et ne constitue pas un conseil juridique. Pour une décision engageante, référez-vous au texte officiel ou à votre conseil.</p>
+  </section>
+</article>
+</main>
+
+<footer>
+  <p>Vigie est un projet en préparation. <a href="../">Retour à l'accueil</a></p>
+</footer>
+</body>
+</html>
