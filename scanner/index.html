@@ -489,6 +489,7 @@ async function queryOsv(components) {
 async function fetchDetails(idList) {
   const details = new Map();
   let next = 0;
+  let done = 0;
   const worker = async () => {
     while (next < idList.length) {
       const id = idList[next++];
@@ -496,9 +497,11 @@ async function fetchDetails(idList) {
         const r = await fetch(OSV_VULN + encodeURIComponent(id));
         if (r.ok) details.set(id, await r.json());
       } catch { /* keep going: one missing detail should not fail the scan */ }
+      done++;
+      if (done % 5 === 0 || done === idList.length) setStatus(`Lecture des avis de sécurité : ${done} sur ${idList.length}…`);
     }
   };
-  await Promise.all(Array.from({ length: 8 }, worker));
+  await Promise.all(Array.from({ length: 16 }, worker));
   return details;
 }
 
@@ -542,7 +545,7 @@ async function scan(getSource) {
     const idsPer = await queryOsv(components);
     const allIds = [...new Set(idsPer.flat())];
     const detailIds = allIds.slice(0, MAX_DETAILS);
-    setStatus(`Lecture de ${detailIds.length} avis de sécurité…`);
+    setStatus(`Lecture des avis de sécurité : 0 sur ${detailIds.length}…`);
     const details = await fetchDetails(detailIds);
     const kevData = await kev;
     const kevCves = kevData ? kevData.cves : {};
