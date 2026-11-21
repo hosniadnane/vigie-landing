@@ -125,6 +125,11 @@
   }
   .signup input:focus-visible { outline-offset: 1px; }
   .signup .note { margin: 12px 0 0; font-size: 0.875rem; color: var(--mute); }
+  .plan-pick { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 12px; font-size: 0.9375rem; color: var(--mute); flex-wrap: wrap; }
+  .plan-pick select {
+    min-height: 36px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px;
+    background: var(--surface); color: var(--ink); font: inherit;
+  }
   .signup .status { margin: 12px 0 0; font-size: 0.9375rem; min-height: 1.5em; }
   .signup .status.ok { color: var(--blue); }
   .signup .status.err { color: var(--signal); }
@@ -207,7 +212,8 @@
   .who .tag { margin: 0 0 14px; font-size: 0.875rem; font-weight: 600; color: var(--blue); }
   @media (max-width: 720px) { .who { grid-template-columns: 1fr; } }
 
-  .plans { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 44px; align-items: stretch; }
+  .plans { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 44px; align-items: stretch; }
+  .plan .for { margin: 6px 0 0; font-size: 0.875rem; color: var(--mute); }
   .plan { padding: 28px; border-radius: var(--radius-sm); border: 1px solid var(--line); background: var(--surface); display: flex; flex-direction: column; }
   .plan.main { border-radius: var(--radius-lg); background: var(--blue-soft); border-color: transparent; }
   .plan h3 { margin: 0; font-size: 1.0625rem; }
@@ -216,7 +222,8 @@
   .plan ul { margin: 18px 0 0; padding-left: 1.1em; color: var(--mute); }
   .plan li + li { margin-top: 6px; }
   .plans-note { margin: 18px 0 0; color: var(--mute); font-size: 0.875rem; }
-  @media (max-width: 820px) { .plans { grid-template-columns: 1fr; } }
+  @media (max-width: 980px) { .plans { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px) { .plans { grid-template-columns: 1fr; } }
 
   .faq { margin-top: 36px; max-width: 760px; }
   .faq details { border-top: 1px solid var(--line); padding: 18px 0; }
@@ -272,6 +279,16 @@
         <label for="email" class="visually-hidden">Adresse e-mail professionnelle</label>
         <input id="email" name="email" type="email" autocomplete="email" placeholder="vous@editeur.fr" required>
         <button class="btn" type="submit">Réserver mon accès anticipé</button>
+      </div>
+      <div class="plan-pick">
+        <label for="offre">Quelle offre vous intéresse ?</label>
+        <select id="offre" name="offre">
+          <option value="">Je ne sais pas encore</option>
+          <option value="decouverte">Découverte (0 €)</option>
+          <option value="fournisseur">Fournisseur (39 € / mois)</option>
+          <option value="essentiel">Essentiel (49 € / mois)</option>
+          <option value="equipe">Équipe (99 € / mois)</option>
+        </select>
       </div>
       <p class="note">Gratuit jusqu'au lancement. Aucune carte bancaire demandée.</p>
       <p class="status" role="status" aria-live="polite"></p>
@@ -360,33 +377,47 @@
       <div class="plans">
         <div class="plan">
           <h3>Découverte</h3>
+          <p class="for">Pour savoir où vous en êtes</p>
           <p class="price">0 €</p>
           <ul>
             <li><a href="test-cra/">Test : votre produit est-il concerné par le CRA ?</a></li>
-            <li>Liste des obligations qui vous concernent</li>
+            <li>Surveillance d'1 produit, avec alerte si un composant est activement exploité</li>
+          </ul>
+        </div>
+        <div class="plan">
+          <h3>Fournisseur</h3>
+          <p class="for">Pour les éditeurs SaaS</p>
+          <p class="price">39 € <span>HT / mois</span></p>
+          <ul>
+            <li>Réponses à vos questionnaires de sécurité clients</li>
+            <li>Dossier DORA : LEI ou EUID, sous-traitants, audits, plan de réversibilité</li>
+            <li>Exigences NIS2 de vos clients</li>
           </ul>
         </div>
         <div class="plan main">
           <h3>Essentiel</h3>
+          <p class="for">Pour un logiciel distribué</p>
           <p class="price">49 € <span>HT / mois</span></p>
           <ul>
             <li>1 produit</li>
             <li>SBOM généré à chaque version</li>
             <li>Veille quotidienne des failles exploitées</li>
             <li>Compte à rebours et brouillons de déclaration</li>
+            <li>Documents CRA : politique de divulgation, documentation technique, déclaration UE</li>
           </ul>
         </div>
         <div class="plan">
           <h3>Équipe</h3>
+          <p class="for">Pour plusieurs produits</p>
           <p class="price">99 € <span>HT / mois</span></p>
           <ul>
             <li>Jusqu'à 5 produits</li>
-            <li>Tous les documents CRA</li>
+            <li>Tout le contenu d'Essentiel</li>
             <li>Dossier fournisseur DORA et NIS2</li>
           </ul>
         </div>
       </div>
-      <p class="plans-note">Tarifs de lancement prévus. Les inscrits sur la liste d'attente seront prévenus avant l'ouverture.</p>
+      <p class="plans-note">Facturation annuelle : 2 mois offerts. Offre de lancement : −30 % la première année pour les inscrits sur la liste d'attente.</p>
     </div>
   </section>
 
@@ -466,7 +497,7 @@
       const response = await fetch(FORM_ENDPOINT, {
         method: "POST",
         headers: { "Accept": "application/json", "Content-Type": "application/json" },
-        body: JSON.stringify({ email: input.value })
+        body: JSON.stringify({ email: input.value, offre: document.getElementById("offre").value || "indecis", source: "accueil" })
       });
       if (!response.ok) throw new Error(String(response.status));
       status.textContent = "C'est noté. Vous serez prévenu avant l'ouverture.";
