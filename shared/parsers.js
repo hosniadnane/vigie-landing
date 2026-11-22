@@ -2,7 +2,15 @@
 // This file must run in both places, so it uses no Node or DOM APIs.
 // Canonical copy: app/src/shared/parsers.js. `npm run sync-web` copies it to landing/shared/parsers.js.
 
-/** @typedef {{ eco: string, name: string, version: string }} Component */
+/** @typedef {{ eco: string, name: string, version: string, sha512?: string, sha256?: string }} Component */
+
+/** Subresource Integrity value ("sha512-<base64>", as in npm, yarn and pnpm lock files) -> hex digest, or undefined. */
+export function sha512Hex(integrity) {
+  const m = /sha512-([A-Za-z0-9+/]+={0,2})/.exec(String(integrity || ""));
+  if (!m) return undefined;
+  const bin = atob(m[1]);
+  return bin.length === 64 ? [...bin].map((ch) => ch.charCodeAt(0).toString(16).padStart(2, "0")).join("") : undefined;
+}
 
 /** @param {unknown} v */
 export const looksLikeVersion = (v) => typeof v === "string" && /^v?\d/.test(v) && !v.includes("use.local");
@@ -15,12 +23,12 @@ export function parsePackageLock(text) {
     for (const [key, v] of Object.entries(j.packages)) {
       const i = key.lastIndexOf("node_modules/");
       if (i < 0 || !v || v.link) continue;
-      out.push({ eco: "npm", name: v.name || key.slice(i + 13), version: v.version });
+      out.push({ eco: "npm", name: v.name || key.slice(i + 13), version: v.version, sha512: sha512Hex(v.integrity) });
     }
   } else if (j.dependencies) {
     const walk = (deps) => {
       for (const [name, v] of Object.entries(deps)) {
-        out.push({ eco: "npm", name, version: v.version });
+        out.push({ eco: "npm", name, version: v.version, sha512: sha512Hex(v.integrity) });
         if (v.dependencies) walk(v.dependencies);
       }
     };
@@ -33,18 +41,23 @@ export function parsePackageLock(text) {
 export function parseYarnLock(text) {
   const out = [];
   let name = null;
+  let last = null; // yarn v1 lists the integrity after the version
   for (const line of text.split(/\r?\n/)) {
     if (!line || line.startsWith("#")) continue;
+    if (last && /^\s+integrity\s/.test(line)) last.sha512 = sha512Hex(line);
     if (!/^\s/.test(line) && line.trimEnd().endsWith(":")) {
       const first = line.trimEnd().slice(0, -1).split(",")[0].trim().replace(/^"|"$/g, "");
       const at = first.lastIndexOf("@");
       name = at > 0 ? first.slice(0, at) : null;
       if (name && first.includes("@workspace:")) name = null;
+      // Alias ("string-width-cjs@npm:string-width@^4"): the installed package is the one after "@npm:".
+      if (name?.includes("@npm:")) name = name.slice(name.indexOf("@npm:") + 5);
       continue;
     }
     const m = line.match(/^\s+version:?\s+"?([^"\s]+)"?\s*$/);
     if (m && name) {
-      out.push({ eco: "npm", name, version: m[1] });
+      last = { eco: "npm", name, version: m[1] };
+      out.push(last);
       name = null;
     }
   }
@@ -55,7 +68,9 @@ export function parseYarnLock(text) {
 export function parsePnpmLock(text) {
   const out = [];
   let inPackages = false;
+  let last = null; // "resolution: {integrity: ...}" follows the package key
   for (const line of text.split(/\r?\n/)) {
+    if (last && /integrity:/.test(line)) last.sha512 = sha512Hex(line);
     if (/^\S/.test(line)) {
       inPackages = /^(packages|snapshots):\s*$/.test(line);
       continue;
@@ -75,7 +90,8 @@ export function parsePnpmLock(text) {
       name = key.slice(0, slash);
       version = key.slice(slash + 1);
     }
-    out.push({ eco: "npm", name, version });
+    last = { eco: "npm", name, version };
+    out.push(last);
   }
   return out;
 }
@@ -96,7 +112,7 @@ export function parseTomlPackages(text, eco) {
   const out = [];
   let cur = null;
   const flush = () => {
-    if (cur && cur.name && cur.version) out.push({ eco, name: cur.name, version: cur.version });
+    if (cur && cur.name && cur.version) out.push({ eco, name: cur.name, version: cur.version, ...(/^[0-9a-f]{64}$/.test(cur.checksum || "") ? { sha256: cur.checksum } : {}) });
   };
   for (const line of text.split(/\r?\n/)) {
     if (/^\s*\[\[package\]\]\s*$/.test(line)) {
@@ -110,7 +126,8 @@ export function parseTomlPackages(text, eco) {
       continue;
     }
     if (!cur) continue;
-    const m = line.match(/^\s*(name|version)\s*=\s*"([^"]+)"/);
+    // Cargo.lock: "checksum" is the SHA-256 of the crate file published on crates.io.
+    const m = line.match(/^\s*(name|version|checksum)\s*=\s*"([^"]+)"/);
     if (m) cur[m[1]] = m[2];
   }
   flush();
