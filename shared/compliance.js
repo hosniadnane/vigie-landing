@@ -27,7 +27,7 @@ export function validateRequirement(input) {
     justification: text(input.justification, 3000),
     measures: text(input.measures, 3000),
     evidence: text(input.evidence, 3000),
-    status: applicable === 0 ? "non_applicable" : input.status in REQ_STATUS && input.status !== "non_applicable" ? input.status : "a_evaluer"
+    status: applicable === 0 ? "non_applicable" : Object.hasOwn(REQ_STATUS, input.status) && input.status !== "non_applicable" ? input.status : "a_evaluer"
   };
   if (applicable === 0 && row.justification.length < 20) errors.push("Une exigence non applicable doit être justifiée (20 caractères au moins).");
   if (row.status === "conforme" && !row.measures) errors.push("Décrivez les mesures qui assurent la conformité.");
@@ -45,7 +45,7 @@ export function validateRisk(input) {
     asset: text(input.asset, 300),
     likelihood: level(input.likelihood),
     impact: level(input.impact),
-    treatment: input.treatment in TREATMENT ? input.treatment : null,
+    treatment: Object.hasOwn(TREATMENT, input.treatment) ? input.treatment : null,
     measures: text(input.measures, 3000),
     residual_likelihood: level(input.residual_likelihood),
     residual_impact: level(input.residual_impact),
@@ -84,9 +84,9 @@ export const CATEGORY_OPTIONS = {
 /** @returns {{ scope: Record<string, string>, errors: string[] }} */
 export function validateScope(input) {
   const scope = {
-    distribution: input.distribution in DISTRIBUTION ? input.distribution : "",
+    distribution: Object.hasOwn(DISTRIBUTION, input.distribution) ? input.distribution : "",
     commercial: input.commercial === "oui" || input.commercial === "non" ? input.commercial : "",
-    category: input.category in CATEGORY_OPTIONS ? input.category : "",
+    category: Object.hasOwn(CATEGORY_OPTIONS, input.category) ? input.category : "",
     standards: input.standards === "oui" ? "oui" : "non"
   };
   const errors = [];
