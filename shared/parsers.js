@@ -243,6 +243,50 @@ export function parserFor(path) {
   return null;
 }
 
+// ----- SBOM import (CycloneDX or SPDX, JSON). Only for files the user drops: a committed SBOM in a repository
+// may be stale, so repository scans read the real dependency files instead (findLockfilePaths ignores SBOMs).
+
+/** purl type -> OSV ecosystem */
+const PURL_ECOSYSTEMS = { npm: "npm", pypi: "PyPI", maven: "Maven", composer: "Packagist", cargo: "crates.io", golang: "Go", gem: "RubyGems", nuget: "NuGet", pub: "Pub", hex: "Hex" };
+
+/** Package URL (pkg:type/namespace/name@version) -> component, or null if the ecosystem is unknown. @param {string} purl */
+export function componentFromPurl(purl) {
+  const m = /^pkg:([a-zA-Z][\w.+-]*)\/([^@?#]+)@([^?#]+)/.exec(String(purl || ""));
+  if (!m) return null;
+  const eco = PURL_ECOSYSTEMS[m[1].toLowerCase()];
+  if (!eco) return null;
+  const parts = m[2].split("/").filter(Boolean).map((x) => decodeURIComponent(x));
+  const version = decodeURIComponent(m[3]);
+  if (!parts.length) return null;
+  const name = eco === "Maven" ? parts.join(":") : parts.join("/");
+  return { eco, name, version };
+}
+
+/** @param {string} text @returns {Component[]} */
+export function parseSbom(text) {
+  const doc = JSON.parse(text);
+  const purls = [];
+  if (doc.bomFormat === "CycloneDX") {
+    const walk = (list) => { for (const c of list || []) { if (c.purl) purls.push(c.purl); walk(c.components); } };
+    walk(doc.components);
+  } else if (doc.spdxVersion) {
+    for (const pkg of doc.packages || []) {
+      const ref = (pkg.externalRefs || []).find((r) => r.referenceType === "purl");
+      if (ref) purls.push(ref.referenceLocator);
+    }
+  } else {
+    throw new Error("Not a CycloneDX or SPDX JSON document");
+  }
+  return purls.map(componentFromPurl).filter(Boolean);
+}
+
+/** A dropped JSON file is treated as an SBOM when its name or content says so. @param {string} path @param {string} text */
+export function looksLikeSbom(path, text) {
+  const base = (path.split("/").pop() || "").toLowerCase();
+  if (/\.(cdx|spdx)\.json$|^s?bom.*\.json$/.test(base)) return true;
+  return base.endsWith(".json") && /"(bomFormat|spdxVersion)"\s*:/.test(text.slice(0, 4096));
+}
+
 const IGNORED_DIRS = /(^|\/)(node_modules|vendor|test|tests|examples?|fixtures?)\//;
 
 /**
@@ -262,14 +306,15 @@ export const componentKey = (c) => `${c.eco}|${c.name.toLowerCase()}|${c.version
 
 /**
  * Parses every recognised file and returns the deduplicated components with an exact version.
+ * With `sbom: true` (files the user dropped), CycloneDX and SPDX JSON documents are read too.
  * A file that fails to parse is reported with count -1 instead of failing the whole scan.
  * @param {{ path: string, text: string }[]} files
  */
-export function extractComponents(files) {
+export function extractComponents(files, { sbom = false } = {}) {
   const seen = new Map();
   const usedFiles = [];
   for (const f of files) {
-    const parse = parserFor(f.path);
+    const parse = parserFor(f.path) || (sbom && looksLikeSbom(f.path, f.text) ? parseSbom : null);
     if (!parse) continue;
     let comps;
     try {

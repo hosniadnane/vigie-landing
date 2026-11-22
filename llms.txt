@@ -11,7 +11,7 @@ Faits clés sur le Cyber Resilience Act, tels que présentés sur ce site :
 
 ## Outils gratuits
 
-- [Scanner de dépendances](https://hosniadnane.github.io/vigie-landing/scanner/) : analyse un dépôt GitHub public ou des fichiers de dépendances dans le navigateur, liste les vulnérabilités connues (OSV.dev), signale celles des catalogues de vulnérabilités activement exploitées de la CISA (KEV) et de l'ENISA (EU KEV) et exporte un SBOM CycloneDX.
+- [Scanner de dépendances](https://hosniadnane.github.io/vigie-landing/scanner/) : analyse dans le navigateur des fichiers de dépendances ou un SBOM CycloneDX ou SPDX (projets privés compris, sans envoi des fichiers), ou un dépôt GitHub public, liste les vulnérabilités connues (OSV.dev), signale celles des catalogues de vulnérabilités activement exploitées de la CISA (KEV) et de l'ENISA (EU KEV) et exporte un SBOM CycloneDX.
 - [Test : votre logiciel est-il concerné par le CRA ?](https://hosniadnane.github.io/vigie-landing/test-cra/) : six questions, résultat immédiat avec les obligations applicables.
 
 ## Guides
