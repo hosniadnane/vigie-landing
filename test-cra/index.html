@@ -79,6 +79,7 @@
   legend { float: left; width: 100%; padding: 0; font-weight: 650; font-size: 1.0625rem; letter-spacing: -0.01em; }
   .hint { clear: both; margin: 0; padding-top: 6px; color: var(--mute); font-size: 0.9375rem; max-width: 62ch; }
   .options { clear: both; display: grid; gap: 10px; padding-top: 16px; }
+  .select { display: block; width: 100%; margin-top: 16px; min-height: 48px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 14px; background: var(--paper); color: var(--ink); font: inherit; }
   .opt {
     display: flex; gap: 12px; align-items: flex-start;
     padding: 14px 16px; border-radius: 14px;
@@ -169,11 +170,16 @@
     </fieldset>
 
     <fieldset>
-      <legend>4. Votre produit appartient-il à l'une de ces catégories ?</legend>
-      <p class="hint">Navigateur, gestionnaire de mots de passe, VPN, antivirus, système d'exploitation, gestion des identités, pare-feu ou détection d'intrusion, hyperviseur.</p>
-      <div class="options">
-        <label class="opt"><input type="radio" name="sensitive" value="no"><span>Non</span></label>
-        <label class="opt"><input type="radio" name="sensitive" value="yes"><span>Oui</span></label>
+      <legend>4. La fonction principale de votre produit relève-t-elle d'une de ces catégories ?</legend>
+      <p class="hint">Liste officielle des produits importants (annexe III) et critiques (annexe IV). Elle détermine qui évalue la conformité : vous, ou un organisme notifié.</p>
+      <label for="category" class="visually-hidden">Catégorie du produit</label>
+      <select id="category" name="category" class="select"><option value="">Choisir…</option></select>
+      <div id="standards-q" hidden>
+        <p class="hint">Appliquez-vous intégralement des normes harmonisées, des spécifications communes ou une certification européenne de cybersécurité ?</p>
+        <div class="options">
+          <label class="opt"><input type="radio" name="standards" value="non" checked><span>Non, ou pas intégralement</span></label>
+          <label class="opt"><input type="radio" name="standards" value="oui"><span>Oui, intégralement</span></label>
+        </div>
       </div>
     </fieldset>
 
@@ -227,7 +233,8 @@
   <p>Tocsio est un projet en préparation. <a href="../">Retour à l'accueil</a></p>
 </footer>
 
-<script>
+<script type="module">
+  import { CATEGORY_OPTIONS, assessScope } from "../shared/compliance.js";
   const FORM_ENDPOINT = "https://formspree.io/f/xvkaworv";
 
   const READY_ITEMS = {
@@ -240,6 +247,10 @@
   };
 
   const quiz = document.getElementById("quiz");
+  // Official Annex III / IV list, shared with the Tocsio app.
+  const categorySelect = document.getElementById("category");
+  for (const [k, label] of Object.entries(CATEGORY_OPTIONS)) categorySelect.add(new Option(label, k));
+  categorySelect.addEventListener("change", () => { document.getElementById("standards-q").hidden = !categorySelect.value.startsWith("I."); });
   const formError = quiz.querySelector(".form-error");
   const result = document.getElementById("result");
   const verdictEl = document.getElementById("verdict");
@@ -271,7 +282,7 @@
       commercial: value("commercial"),
       delivery: value("delivery"),
       sector: value("sector"),
-      sensitive: value("sensitive"),
+      category: categorySelect.value || null,
       small: value("small")
     };
     const missing = Object.entries(answers).filter(([, v]) => !v).length;
@@ -313,7 +324,8 @@
       return;
     }
 
-    summary = "concerne" + (answers.sensitive === "yes" ? "-important" : "") + (answers.small === "yes" ? "-petite" : "") + `-${ready.length}sur6`;
+    const scope = assessScope({ distribution: answers.delivery === "hybrid" ? "saas_composant" : "logiciel", commercial: "oui", category: answers.category, standards: value("standards") || "non" });
+    summary = "concerne-" + answers.category.replace(".", "") + (answers.small === "yes" ? "-petite" : "") + `-${ready.length}sur6`;
 
     let html = "";
     if (answers.delivery === "hybrid") {
@@ -338,9 +350,7 @@
         "Rédiger la documentation technique, signer la déclaration UE de conformité et apposer le marquage CE."
       ]);
 
-    if (answers.sensitive === "yes") {
-      html += "<div class=\"note\"><p>Votre produit semble faire partie des produits « importants » listés à l'annexe III. Son évaluation de conformité peut exiger l'application de normes harmonisées ou l'intervention d'un organisme tiers, au lieu d'une simple auto-évaluation.</p></div>";
-    }
+    html += `<div class="note"><p><strong>${scope.label}.</strong> ${scope.route}</p></div>`;
     if (answers.small === "yes") {
       html += "<div class=\"note\"><p>En tant que micro ou petite entreprise, vous ne pouvez pas recevoir d'amende pour avoir manqué le délai de 24 heures de l'alerte précoce (article 64, paragraphe 10). La déclaration, la notification à 72 heures et le rapport final restent obligatoires.</p></div>";
     }

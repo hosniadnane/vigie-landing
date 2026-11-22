@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Signaler à l'ENISA en 24 heures : délais et contenu (CRA, article 14)</title>
+<meta name="description" content="Depuis le 11 septembre 2026, les fabricants de logiciels doivent signaler à l'ENISA les vulnérabilités activement exploitées et les incidents graves : alerte précoce en 24 heures, notification en 72 heures, rapport final. Calculez vos échéances et préparez chaque déclaration.">
+<link rel="canonical" href="https://hosniadnane.github.io/vigie-landing/signaler-enisa/">
+<link rel="stylesheet" href="../shared/tools.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "Signaler à l'ENISA en 24 heures : délais et contenu des déclarations du Cyber Resilience Act",
+  "inLanguage": "fr",
+  "about": "Article 14 du règlement (UE) 2024/2847 (Cyber Resilience Act)",
+  "datePublished": "2026-11-22",
+  "author": { "@type": "Organization", "name": "Tocsio" }
+}
+</script>
+</head>
+<body>
+<header class="nav"><div class="nav-inner"><a class="brand" href="../">Tocsio</a><a class="btn btn-small" href="../#inscription">Réserver mon accès</a></div></header>
+<main>
+  <h1>Signaler à l'ENISA en 24 heures</h1>
+  <p class="lede">Depuis le 11 septembre 2026, tout fabricant d'un produit logiciel vendu dans l'Union doit signaler les vulnérabilités activement exploitées et les incidents graves qui touchent son produit, sur la plateforme unique de signalement de l'ENISA. Voici les délais, le contenu de chaque déclaration et un calculateur d'échéances.</p>
+
+  <section class="card" aria-labelledby="calc-title">
+    <h2 id="calc-title">Calculez vos échéances</h2>
+    <form id="calc">
+      <label for="kind">Que s'est-il passé ?</label>
+      <select id="kind">
+        <option value="vuln">Une vulnérabilité de mon produit est activement exploitée</option>
+        <option value="incident">Un incident grave a un impact sur la sécurité de mon produit</option>
+      </select>
+      <label for="aware">Quand en avez-vous eu connaissance ?</label>
+      <input type="datetime-local" id="aware" required>
+      <div id="fix-row"><label for="fix">Date de disponibilité du correctif (si elle est connue)</label><input type="date" id="fix"></div>
+      <div class="row"><button class="btn" type="submit">Calculer</button></div>
+    </form>
+    <ul class="steps" id="deadlines" hidden></ul>
+    <p class="hint" id="tz"></p>
+  </section>
+
+  <h2>Les trois déclarations</h2>
+  <h3>1. Alerte précoce : 24 heures</h3>
+  <p>Au plus tard 24 heures après avoir eu connaissance d'une vulnérabilité activement exploitée ou d'un incident grave. Elle indique, le cas échéant, les États membres où vous savez que le produit est mis à disposition et, pour un incident, s'il est soupçonné d'être causé par un acte illicite ou malveillant.</p>
+  <h3>2. Notification : 72 heures</h3>
+  <p>Au plus tard 72 heures après en avoir eu connaissance : informations générales sur le produit, la nature de la vulnérabilité ou de l'incident, les mesures correctives ou d'atténuation prises, celles que les utilisateurs peuvent prendre, et la sensibilité des informations transmises.</p>
+  <h3>3. Rapport final</h3>
+  <p>Pour une vulnérabilité : au plus tard 14 jours après la mise à disposition d'un correctif ou d'une mesure d'atténuation, avec la description de la vulnérabilité, sa gravité, son impact, l'acteur malveillant s'il est connu et la mise à jour de sécurité. Pour un incident : au plus tard un mois après la notification, avec sa description détaillée, sa cause probable et les mesures d'atténuation.</p>
+  <h3>Et vos utilisateurs</h3>
+  <p>Vous devez aussi informer les utilisateurs concernés de la vulnérabilité ou de l'incident et des mesures qu'ils peuvent prendre (article 14, paragraphe 8).</p>
+
+  <div class="note"><p><strong>Petites entreprises.</strong> Une micro ou petite entreprise ne peut pas être sanctionnée pour avoir manqué le délai de 24 heures de l'alerte précoce (article 64, paragraphe 10). La notification à 72 heures et le rapport final restent dus.</p></div>
+
+  <h2>Avant d'en avoir besoin</h2>
+  <ul>
+    <li>Désignez qui déclare, et vérifiez dès maintenant comment cette personne accède à la <a href="https://www.enisa.europa.eu/topics/product-security/single-reporting-platform-srp">plateforme unique de signalement de l'ENISA</a>.</li>
+    <li>Tenez à jour la liste de vos composants (SBOM) pour chaque version encore utilisée : c'est elle qui vous dit en quelques minutes si une faille exploitée vous touche.</li>
+    <li>Surveillez chaque jour les catalogues de vulnérabilités activement exploitées de la CISA et de l'ENISA : le délai de 24 heures court dès que vous avez connaissance de l'exploitation.</li>
+    <li>Préparez des modèles pour les trois déclarations et pour le message à vos utilisateurs.</li>
+  </ul>
+
+  <section class="cta" aria-labelledby="cta-title">
+    <h2 id="cta-title">Tocsio surveille, compte et prépare</h2>
+    <p>Tocsio vérifie chaque jour les composants de vos produits face aux failles activement exploitées, vous alerte, ouvre un dossier avec les échéances de l'article 14 et pré-remplit les trois déclarations et le message aux utilisateurs.</p>
+    <a class="btn" href="../#inscription">Réserver mon accès</a>
+    <p class="hint"><a href="../scanner/">Analysez vos dépendances gratuitement</a> · <a href="../test-cra/">Votre produit est-il concerné ?</a></p>
+  </section>
+  <p class="disclaimer">Source : règlement (UE) 2024/2847, articles 14 et 64. Cette page ne constitue pas un conseil juridique.</p>
+</main>
+<footer><p>Tocsio est un projet en préparation. <a href="../">Retour à l'accueil</a></p></footer>
+<script type="module">
+  const $ = (id) => document.getElementById(id);
+  const kind = $("kind");
+  const sync = () => { $("fix-row").hidden = kind.value !== "vuln"; };
+  kind.addEventListener("change", sync);
+  sync();
+  const DAY = 86400000;
+  const fmt = (ms) => new Date(ms).toLocaleString("fr-FR", { weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" });
+  const addMonth = (ms) => { const d = new Date(ms); d.setMonth(d.getMonth() + 1); return d.getTime(); };
+  $("calc").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const aware = Date.parse($("aware").value);
+    if (Number.isNaN(aware)) return;
+    const items = [["Alerte précoce", aware + DAY], ["Notification", aware + 3 * DAY]];
+    if (kind.value === "incident") items.push(["Rapport final", addMonth(aware + 3 * DAY), "un mois après la notification (au plus tard à cette date si la notification est envoyée à l'échéance)"]);
+    else if ($("fix").value) items.push(["Rapport final", Date.parse(`${$("fix").value}T23:59`) + 14 * DAY, "14 jours après le correctif"]);
+    else items.push(["Rapport final", null, "14 jours après la mise à disposition d'un correctif"]);
+    items.push(["Information des utilisateurs", null, "sans retard injustifié"]);
+    const list = $("deadlines");
+    list.innerHTML = "";
+    for (const [label, at, rule] of items) {
+      const li = document.createElement("li");
+      const left = document.createElement("div");
+      left.innerHTML = `<strong></strong><br><span class="hint"></span>`;
+      left.querySelector("strong").textContent = label;
+      left.querySelector("span").textContent = rule || "";
+      const right = document.createElement("div");
+      right.textContent = at ? fmt(at) : "";
+      if (at && at < Date.now()) right.className = "err";
+      li.append(left, right);
+      list.append(li);
+    }
+    list.hidden = false;
+    $("tz").textContent = `Heures affichées dans votre fuseau (${Intl.DateTimeFormat().resolvedOptions().timeZone}).`;
+  });
+</script>
+</body>
+</html>

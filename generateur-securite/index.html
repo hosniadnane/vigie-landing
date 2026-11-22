@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Générateur gratuit : security.txt et politique de divulgation des vulnérabilités</title>
+<meta name="description" content="Générez en une minute votre fichier security.txt (RFC 9116) et votre politique de divulgation coordonnée des vulnérabilités, exigée par le Cyber Resilience Act. Gratuit, en français, rien n'est envoyé.">
+<link rel="canonical" href="https://hosniadnane.github.io/vigie-landing/generateur-securite/">
+<link rel="stylesheet" href="../shared/tools.css">
+</head>
+<body>
+<header class="nav"><div class="nav-inner"><a class="brand" href="../">Tocsio</a><a class="btn btn-small" href="../#inscription">Réserver mon accès</a></div></header>
+<main>
+  <h1>Votre security.txt et votre politique de divulgation, en une minute</h1>
+  <p class="lede">Le Cyber Resilience Act impose une politique de divulgation coordonnée des vulnérabilités et une adresse de contact pour les signaler (annexe I, partie II). Le fichier security.txt (RFC 9116) dit aux chercheurs où écrire. Quatre champs suffisent ; tout est généré dans votre navigateur, rien n'est envoyé.</p>
+
+  <section class="card" aria-labelledby="form-title">
+    <h2 id="form-title">Vos informations</h2>
+    <form id="gen">
+      <label for="company_name">Raison sociale</label><input type="text" id="company_name" required placeholder="Acme SAS">
+      <label for="product_name">Nom du produit</label><input type="text" id="product_name" required placeholder="Acme Gestion">
+      <label for="security_email">Adresse de signalement des vulnérabilités</label><input type="email" id="security_email" required placeholder="securite@acme.fr">
+      <label for="website">Site web</label><input type="url" id="website" required placeholder="https://acme.fr">
+      <p class="err" id="error" role="alert"></p>
+      <div class="row"><button class="btn" type="submit">Générer</button></div>
+    </form>
+  </section>
+
+  <section id="out" hidden>
+    <section class="card" aria-labelledby="txt-title">
+      <h2 id="txt-title">security.txt</h2>
+      <p class="hint">À publier à l'adresse <strong id="txt-url"></strong>. La date d'expiration doit rester à moins d'un an : régénérez le fichier chaque année.</p>
+      <pre class="code" id="txt"></pre>
+      <div class="row"><a class="btn btn-small btn-ghost" id="txt-dl" download="security.txt">Télécharger security.txt</a></div>
+    </section>
+    <section class="card" aria-labelledby="pol-title">
+      <h2 id="pol-title">Politique de divulgation coordonnée</h2>
+      <p class="hint">À publier à l'adresse <strong id="pol-url"></strong>, celle qu'indique votre security.txt. Relisez les engagements (délais) et adaptez-les si besoin.</p>
+      <pre class="code" id="pol"></pre>
+    </section>
+  </section>
+
+  <section class="cta" aria-labelledby="cta-title">
+    <h2 id="cta-title">Le reste du dossier CRA</h2>
+    <p>Tocsio prépare aussi la politique de gestion des vulnérabilités, la déclaration UE de conformité, la documentation technique avec l'analyse des risques, les informations destinées à l'utilisateur et votre SBOM, puis les tient à jour à chaque version.</p>
+    <a class="btn" href="../#inscription">Réserver mon accès</a>
+    <p class="hint"><a href="../signaler-enisa/">Signaler à l'ENISA en 24 heures</a> · <a href="../verifier-sbom/">Vérifier votre SBOM</a></p>
+  </section>
+  <p class="disclaimer">Modèles fournis à titre indicatif : ils ne constituent pas un conseil juridique.</p>
+</main>
+<footer><p>Tocsio est un projet en préparation. <a href="../">Retour à l'accueil</a></p></footer>
+<script type="module">
+  import { securityTxt, cvdPolicy } from "../shared/policies.js";
+  const $ = (id) => document.getElementById(id);
+  $("gen").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const p = Object.fromEntries(["company_name", "product_name", "security_email", "website"].map((k) => [k, $(k).value.trim()]));
+    if (!$("gen").checkValidity()) { $("error").textContent = "Complétez les quatre champs."; return; }
+    if (!/^https:\/\//.test(p.website)) { $("error").textContent = "Le site web doit commencer par https://."; return; }
+    $("error").textContent = "";
+    const site = p.website.replace(/\/$/, "");
+    const txt = securityTxt(p, new Date());
+    $("txt").textContent = txt;
+    $("pol").textContent = cvdPolicy(p);
+    $("txt-url").textContent = `${site}/.well-known/security.txt`;
+    $("pol-url").textContent = `${site}/securite/divulgation`;
+    $("txt-dl").href = URL.createObjectURL(new Blob([txt], { type: "text/plain" }));
+    $("out").hidden = false;
+    $("out").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+  });
+</script>
+</body>
+</html>

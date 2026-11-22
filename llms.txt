@@ -12,7 +12,10 @@ Faits clés sur le Cyber Resilience Act, tels que présentés sur ce site :
 ## Outils gratuits
 
 - [Scanner de dépendances](https://hosniadnane.github.io/vigie-landing/scanner/) : analyse dans le navigateur des fichiers de dépendances ou un SBOM CycloneDX ou SPDX (projets privés compris, sans envoi des fichiers), ou un dépôt GitHub public, liste les vulnérabilités connues (OSV.dev), signale celles des catalogues de vulnérabilités activement exploitées de la CISA (KEV) et de l'ENISA (EU KEV) et exporte un SBOM CycloneDX.
-- [Test : votre logiciel est-il concerné par le CRA ?](https://hosniadnane.github.io/vigie-landing/test-cra/) : six questions, résultat immédiat avec les obligations applicables.
+- [Test : votre logiciel est-il concerné par le CRA ?](https://hosniadnane.github.io/vigie-landing/test-cra/) : six questions, résultat immédiat avec les obligations applicables, la classe du produit selon la liste officielle des annexes III et IV et la procédure d'évaluation de la conformité (contrôle interne ou organisme notifié).
+- [Signaler à l'ENISA en 24 heures](https://hosniadnane.github.io/vigie-landing/signaler-enisa/) : délais et contenu des trois déclarations de l'article 14 (vulnérabilité activement exploitée ou incident grave), information des utilisateurs, calculateur d'échéances.
+- [Générateur security.txt et politique de divulgation](https://hosniadnane.github.io/vigie-landing/generateur-securite/) : fichier security.txt (RFC 9116) et politique de divulgation coordonnée des vulnérabilités en français, générés dans le navigateur.
+- [Vérificateur de SBOM](https://hosniadnane.github.io/vigie-landing/verifier-sbom/) : vérifie un SBOM CycloneDX ou SPDX (JSON) au regard du CRA (annexe I, partie II, point 1) et du niveau de détail de la directive technique BSI TR-03183-2 (licences, empreintes SHA-512, fournisseurs, dépendances), sans envoi du fichier.
 
 ## Guides
 

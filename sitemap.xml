@@ -10,10 +10,22 @@
   </url>
   <url>
     <loc>https://hosniadnane.github.io/vigie-landing/test-cra/</loc>
-    <lastmod>2026-11-21</lastmod>
+    <lastmod>2026-11-22</lastmod>
   </url>
   <url>
     <loc>https://hosniadnane.github.io/vigie-landing/scanner/</loc>
     <lastmod>2026-11-21</lastmod>
+  </url>
+  <url>
+    <loc>https://hosniadnane.github.io/vigie-landing/signaler-enisa/</loc>
+    <lastmod>2026-11-22</lastmod>
+  </url>
+  <url>
+    <loc>https://hosniadnane.github.io/vigie-landing/generateur-securite/</loc>
+    <lastmod>2026-11-22</lastmod>
+  </url>
+  <url>
+    <loc>https://hosniadnane.github.io/vigie-landing/verifier-sbom/</loc>
+    <lastmod>2026-11-22</lastmod>
   </url>
 </urlset>

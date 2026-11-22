@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vérifier son SBOM pour le Cyber Resilience Act (CycloneDX, SPDX, BSI TR-03183-2)</title>
+<meta name="description" content="Déposez votre SBOM CycloneDX ou SPDX : vérifiez ce qu'exige le Cyber Resilience Act et ce qu'ajoute la directive technique allemande BSI TR-03183-2 (licences, empreintes, fournisseurs, dépendances). Gratuit, le fichier reste dans votre navigateur.">
+<link rel="canonical" href="https://hosniadnane.github.io/vigie-landing/verifier-sbom/">
+<link rel="stylesheet" href="../shared/tools.css">
+</head>
+<body>
+<header class="nav"><div class="nav-inner"><a class="brand" href="../">Tocsio</a><a class="btn btn-small" href="../#inscription">Réserver mon accès</a></div></header>
+<main>
+  <h1>Votre SBOM tient-il la route ?</h1>
+  <p class="lede">Le Cyber Resilience Act exige une nomenclature des logiciels (SBOM) « dans un format couramment utilisé et lisible par machine couvrant au moins les dépendances de niveau supérieur ». En l'absence de norme harmonisée, la directive technique BSI TR-03183-2 sert de référence pour le niveau de détail. Déposez votre SBOM : le fichier ne quitte pas votre navigateur.</p>
+
+  <section class="card" aria-label="Déposer un SBOM">
+    <label class="drop" id="drop"><input type="file" id="file" accept=".json,application/json"><strong>Déposez votre SBOM ici</strong>, ou cliquez pour le choisir<br><span class="hint">CycloneDX ou SPDX 2.x, au format JSON</span></label>
+    <p class="err" id="error" role="alert"></p>
+  </section>
+
+  <section id="out" hidden>
+    <section class="card" aria-labelledby="cra-title"><h2 id="cra-title">Exigences du CRA</h2><p class="hint" id="summary"></p><ul class="steps" id="cra"></ul></section>
+    <section class="card" aria-labelledby="bsi-title"><h2 id="bsi-title">Niveau de détail BSI TR-03183-2</h2>
+      <p class="hint">Référence allemande utilisée en attendant les normes harmonisées. Elle demande en particulier une empreinte SHA-512, une licence SPDX et un fournisseur pour chaque composant.</p>
+      <ul class="steps" id="bsi"></ul></section>
+  </section>
+
+  <section class="cta" aria-labelledby="cta-title">
+    <h2 id="cta-title">Pas encore de SBOM ?</h2>
+    <p>Le <a href="../scanner/">scanner gratuit</a> en génère un à partir de vos fichiers de dépendances. Tocsio le produit à chaque version, avec les licences, l'archive dix ans et surveille chaque jour ses composants face aux failles activement exploitées.</p>
+    <a class="btn" href="../#inscription">Réserver mon accès</a>
+  </section>
+  <p class="disclaimer">Analyse indicative des champs présents dans le fichier : elle ne vérifie pas que le SBOM décrit fidèlement votre produit. Sources : règlement (UE) 2024/2847, annexe I, partie II, point 1 ; BSI TR-03183-2.</p>
+</main>
+<footer><p>Tocsio est un projet en préparation. <a href="../">Retour à l'accueil</a></p></footer>
+<script type="module">
+  import { checkSbom } from "../shared/sbom-check.js";
+  const $ = (id) => document.getElementById(id);
+  const LABEL = { ok: "Conforme", partial: "Partiel", missing: "Absent" };
+  function show(list, checks) {
+    list.innerHTML = "";
+    for (const c of checks) {
+      const li = document.createElement("li");
+      const left = document.createElement("div");
+      left.innerHTML = "<strong></strong><br><span class=\"hint\"></span>";
+      left.querySelector("strong").textContent = c.label;
+      left.querySelector("span").textContent = c.detail;
+      const tag = document.createElement("span");
+      tag.className = `tag ${c.status}`;
+      tag.textContent = LABEL[c.status];
+      li.append(left, tag);
+      list.append(li);
+    }
+  }
+  async function analyse(file) {
+    $("error").textContent = "";
+    $("out").hidden = true;
+    if (file.size > 50 * 1024 * 1024) { $("error").textContent = "Fichier trop volumineux (50 Mo au maximum)."; return; }
+    const r = checkSbom(await file.text());
+    if (r.error) { $("error").textContent = r.error; return; }
+    $("summary").textContent = `${file.name} : ${r.format} ${r.version}, ${r.total} composants.`;
+    show($("cra"), r.cra);
+    show($("bsi"), r.bsi);
+    $("out").hidden = false;
+  }
+  const drop = $("drop");
+  $("file").addEventListener("change", () => $("file").files[0] && analyse($("file").files[0]));
+  ["dragenter", "dragover"].forEach((t) => drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.add("over"); }));
+  ["dragleave", "drop"].forEach((t) => drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.remove("over"); }));
+  drop.addEventListener("drop", (e) => e.dataTransfer.files[0] && analyse(e.dataTransfer.files[0]));
+</script>
+</body>
+</html>
