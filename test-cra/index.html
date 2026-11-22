@@ -8,30 +8,30 @@
 <link rel="canonical" href="https://hosniadnane.github.io/vigie-landing/test-cra/">
 <style>
   :root {
-    --paper: #FBFBFD;
+    --paper: #FAF8F4;
     --surface: #FFFFFF;
-    --ink: #1D1D1F;
-    --mute: #6E6E73;
-    --line: #E3E3E8;
-    --blue: #0B3B8C;
-    --blue-soft: #EEF2FA;
-    --signal: #C8322B;
+    --ink: #1C1917;
+    --mute: #6B645D;
+    --line: #E6E0D7;
+    --blue: #1C1917; --on-fill: #FFFFFF;
+    --blue-soft: #F1EDE6;
+    --signal: #B42318;
     --ok: #1F7A4D;
-    --nav: rgba(251, 251, 253, 0.72);
+    --nav: rgba(250, 248, 244, 0.8);
     color-scheme: light;
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --paper: #0F1012;
-      --surface: #17181B;
-      --ink: #F5F5F7;
-      --mute: #A1A1A6;
-      --line: #2C2D31;
-      --blue: #7FA6F0;
-      --blue-soft: #18213A;
-      --signal: #FF6B5E;
+      --paper: #141210;
+      --surface: #1C1A17;
+      --ink: #F5F3EF;
+      --mute: #AAA29A;
+      --line: #2E2A25;
+      --blue: #F5F3EF; --on-fill: #141210;
+      --blue-soft: #24211D;
+      --signal: #FF8A7A;
       --ok: #5BC98F;
-      --nav: rgba(15, 16, 18, 0.72);
+      --nav: rgba(20, 18, 16, 0.8);
       color-scheme: dark;
     }
   }
@@ -61,14 +61,14 @@
 
   .btn {
     display: inline-flex; align-items: center; justify-content: center;
-    min-height: 44px; padding: 0 22px; border: 0; border-radius: 999px;
-    background: var(--blue); color: #fff; font: inherit; font-weight: 600; text-decoration: none; cursor: pointer;
+    min-height: 44px; padding: 0 22px; border: 0; border-radius: 8px;
+    background: var(--blue); color: var(--on-fill); font: inherit; font-weight: 600; text-decoration: none; cursor: pointer;
     transition: transform 100ms ease-out, opacity 150ms ease;
   }
   .btn:hover { opacity: 0.92; }
   .btn:active { transform: scale(0.97); }
   .btn-small { min-height: 34px; padding: 0 14px; font-size: 0.875rem; }
-  @media (prefers-color-scheme: dark) { .btn { color: #0F1012; } }
+  @media (prefers-color-scheme: dark) { .btn { color: var(--on-fill); } }
 
   main { max-width: 720px; margin: 0 auto; padding: clamp(48px, 8vw, 88px) 20px clamp(56px, 8vw, 96px); }
   h1 { margin: 0; font-size: clamp(2rem, 5vw, 3rem); line-height: 1.08; letter-spacing: -0.032em; }
@@ -92,7 +92,7 @@
   .submit-row { padding-top: 28px; border-top: 1px solid var(--line); }
   .form-error { margin: 12px 0 0; color: var(--signal); min-height: 1.5em; }
 
-  .result { margin-top: 48px; padding: clamp(24px, 4vw, 36px); border-radius: 22px; background: var(--surface); border: 1px solid var(--line); }
+  .result { margin-top: 48px; padding: clamp(24px, 4vw, 36px); border-radius: 12px; background: var(--surface); border: 1px solid var(--line); }
   .verdict { margin: 0; font-size: clamp(1.5rem, 3.4vw, 2rem); line-height: 1.15; letter-spacing: -0.026em; }
   .verdict.in { color: var(--signal); }
   .verdict.out { color: var(--ok); }
@@ -109,7 +109,7 @@
   .signup-row { display: flex; gap: 10px; margin-top: 16px; }
   .signup input[type=email] {
     flex: 1; min-width: 0; min-height: 44px; padding: 0 16px;
-    border: 1px solid var(--line); border-radius: 999px; background: var(--paper); color: var(--ink); font: inherit;
+    border: 1px solid var(--line); border-radius: 8px; background: var(--paper); color: var(--ink); font: inherit;
   }
   .status { margin: 12px 0 0; min-height: 1.5em; font-size: 0.9375rem; }
   .status.ok { color: var(--blue); }
