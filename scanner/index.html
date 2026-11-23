@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Scanner gratuit : SBOM et failles activement exploitées dans vos dépendances</title>
-<meta name="description" content="Analysez gratuitement un dépôt GitHub public ou un fichier de dépendances : nomenclature logicielle (SBOM CycloneDX), vulnérabilités connues et failles activement exploitées selon les catalogues de la CISA et de l'ENISA. Analyse dans votre navigateur.">
+<title>Scanner gratuit : SBOM et vulnérabilités activement exploitées dans vos dépendances</title>
+<meta name="description" content="Analysez gratuitement un dépôt GitHub public ou un fichier de dépendances : nomenclature logicielle (SBOM CycloneDX), vulnérabilités connues et vulnérabilités activement exploitées selon les catalogues de la CISA et de l'ENISA. Analyse dans votre navigateur.">
 <link rel="canonical" href="https://hosniadnane.github.io/vigie-landing/scanner/">
 <script type="application/ld+json">
 {
@@ -167,7 +167,7 @@
 </header>
 
 <main>
-  <h1>Vos dépendances contiennent-elles une faille activement exploitée ?</h1>
+  <h1>Vos dépendances contiennent-elles une vulnérabilité activement exploitée ?</h1>
   <p class="lede">Déposez vos fichiers de dépendances ou votre SBOM, ou collez l'adresse d'un dépôt GitHub public. Vous obtenez la liste de vos composants (SBOM), leurs vulnérabilités connues, et celles qui sont exploitées en ce moment selon les catalogues de la CISA et de l'ENISA.</p>
 
   <section class="input-card" aria-label="Lancer une analyse">
@@ -200,7 +200,7 @@
     <div class="stats">
       <div class="stat"><b id="n-comp">0</b><span>composants analysés</span></div>
       <div class="stat"><b id="n-vuln">0</b><span>composants avec une vulnérabilité connue</span></div>
-      <div class="stat" id="kev-stat"><b id="n-kev">0</b><span>failles activement exploitées</span></div>
+      <div class="stat" id="kev-stat"><b id="n-kev">0</b><span>vulnérabilités activement exploitées</span></div>
     </div>
     <div id="callout"></div>
     <div class="actions">
@@ -210,12 +210,12 @@
   </section>
 
   <section class="cta" aria-labelledby="t-cta">
-    <h2 id="t-cta">Une analyse ne suffit pas : les failles apparaissent après la publication</h2>
+    <h2 id="t-cta">Une analyse ne suffit pas : les vulnérabilités apparaissent après la publication</h2>
     <p>Tocsio surveillera vos dépôts privés chaque jour, vous alertera dès qu'un composant devient activement exploité, lancera le compte à rebours de 24 heures et préparera votre déclaration à l'ENISA.</p>
     <a class="btn" href="../#inscription">Réserver mon accès anticipé</a>
   </section>
 
-  <p class="disclaimer">Cet outil donne une indication et ne constitue pas un audit ni un conseil juridique. Il ne voit que les dépendances déclarées dans les fichiers analysés. Données : <a href="https://osv.dev">OSV.dev</a> pour les vulnérabilités, <a href="https://www.cisa.gov/known-exploited-vulnerabilities-catalog">catalogue KEV de la CISA</a> et <a href="https://euvd.enisa.europa.eu/">catalogue européen de l'ENISA</a> pour les failles exploitées, copie mise à jour chaque jour. Pour comprendre vos obligations, lisez notre <a href="../cyber-resilience-act-editeurs/">guide du Cyber Resilience Act</a> ou faites le <a href="../test-cra/">test gratuit</a>.</p>
+  <p class="disclaimer">Cet outil donne une indication et ne constitue pas un audit ni un conseil juridique. Il ne voit que les dépendances déclarées dans les fichiers analysés. Données : <a href="https://osv.dev">OSV.dev</a> pour les vulnérabilités, <a href="https://www.cisa.gov/known-exploited-vulnerabilities-catalog">catalogue KEV de la CISA</a> et <a href="https://euvd.enisa.europa.eu/">catalogue européen de l'ENISA</a> pour les vulnérabilités exploitées, copie mise à jour chaque jour. Pour comprendre vos obligations, lisez notre <a href="../cyber-resilience-act-editeurs/">guide du Cyber Resilience Act</a> ou faites le <a href="../test-cra/">test gratuit</a>.</p>
 </main>
 
 <footer>
@@ -411,11 +411,11 @@ function render(source, usedFiles, components, rows, kevData, partial) {
 
   let callout = "";
   if (!kevData) {
-    callout = `<div class="callout calm"><p>Le catalogue des failles exploitées n'a pas pu être chargé : seules les vulnérabilités connues sont affichées.</p></div>`;
+    callout = `<div class="callout calm"><p>Le catalogue des vulnérabilités exploitées n'a pas pu être chargé : seules les vulnérabilités connues sont affichées.</p></div>`;
   } else if (kevRows.length) {
-    callout = `<div class="callout"><p><strong>${kevRows.length} faille${kevRows.length > 1 ? "s" : ""} de vos dépendances ${kevRows.length > 1 ? "sont" : "est"} activement exploitée${kevRows.length > 1 ? "s" : ""}.</strong> Cela ne veut pas dire que votre produit est forcément touché : vérifiez si le code vulnérable est utilisé.</p><p>Si c'est le cas et que vous distribuez ce logiciel dans l'Union, l'article 14 du Cyber Resilience Act impose une alerte précoce à l'ENISA dans les 24 heures.</p></div>`;
+    callout = `<div class="callout"><p><strong>${kevRows.length} vulnérabilité${kevRows.length > 1 ? "s" : ""} de vos dépendances ${kevRows.length > 1 ? "sont" : "est"} activement exploitée${kevRows.length > 1 ? "s" : ""}.</strong> Cela ne veut pas dire que votre produit est forcément touché : vérifiez si le code vulnérable est utilisé.</p><p>Si c'est le cas et que vous distribuez ce logiciel dans l'Union, l'article 14 du Cyber Resilience Act impose une alerte précoce à l'ENISA dans les 24 heures.</p></div>`;
   } else {
-    callout = `<div class="callout calm"><p>Aucune faille activement exploitée dans ces dépendances aujourd'hui. Cela peut changer à tout moment : une faille connue peut être ajoutée demain au catalogue de la CISA ou de l'ENISA.</p></div>`;
+    callout = `<div class="callout calm"><p>Aucune vulnérabilité activement exploitée dans ces dépendances aujourd'hui. Cela peut changer à tout moment : une vulnérabilité connue peut être ajoutée demain au catalogue de la CISA ou de l'ENISA.</p></div>`;
   }
   if (partial) callout += `<div class="callout calm"><p>Beaucoup d'avis de sécurité concernent ce projet : seuls les ${MAX_DETAILS} premiers ont été détaillés.</p></div>`;
   $("callout").innerHTML = callout;
